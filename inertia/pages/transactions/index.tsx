@@ -17,12 +17,25 @@ type Transaction = {
 }
 type Option = { id: number; name: string }
 
-type Props = { transactions: Transaction[]; accounts: Option[]; categories: Option[] }
+type Filters = {
+  month: string
+  accountId: string
+  categoryId: string
+  type: string
+  search: string
+}
+
+type Props = {
+  transactions: Transaction[]
+  accounts: Option[]
+  categories: Option[]
+  filters: Filters
+}
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 const today = () => new Date().toISOString().slice(0, 10)
 
-export default function TransactionsIndex({ transactions, accounts, categories }: Props) {
+export default function TransactionsIndex({ transactions, accounts, categories, filters }: Props) {
   const [editingId, setEditingId] = useState<number | null>(null)
 
   const emptyForm = {
@@ -35,6 +48,35 @@ export default function TransactionsIndex({ transactions, accounts, categories }
     categoryId: '',
   }
   const form = useForm(emptyForm)
+
+  const [filterValues, setFilterValues] = useState<Filters>(filters)
+
+  function applyFilters(e?: React.FormEvent) {
+    e?.preventDefault()
+    // On n'envoie que les filtres remplis
+    const params = Object.fromEntries(Object.entries(filterValues).filter(([, v]) => v !== ''))
+    router.get('/transactions', params, {
+      preserveState: true,
+      preserveScroll: true,
+      replace: true,
+    })
+  }
+
+  function resetFilters() {
+    const empty = { month: '', accountId: '', categoryId: '', type: '', search: '' }
+    setFilterValues(empty)
+    router.get('/transactions', {}, { preserveState: true, preserveScroll: true, replace: true })
+  }
+
+  const setFilter = (key: keyof Filters, value: string) =>
+    setFilterValues((prev) => ({ ...prev, [key]: value }))
+
+  const totalIncome = transactions
+    .filter((t) => t.type === 'income')
+    .reduce((s, t) => s + t.amount, 0)
+  const totalExpense = transactions
+    .filter((t) => t.type === 'expense')
+    .reduce((s, t) => s + t.amount, 0)
 
   if (accounts.length === 0) {
     return (
@@ -201,6 +243,91 @@ export default function TransactionsIndex({ transactions, accounts, categories }
             )}
           </div>
         </form>
+
+        <h2>Filtres</h2>
+        <form
+          onSubmit={applyFilters}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            alignItems: 'end',
+            marginBottom: '1rem',
+          }}
+        >
+          <label>
+            Mois
+            <br />
+            <input
+              type="month"
+              value={filterValues.month}
+              onChange={(e) => setFilter('month', e.target.value)}
+            />
+          </label>
+
+          <label>
+            Compte
+            <br />
+            <select
+              value={filterValues.accountId}
+              onChange={(e) => setFilter('accountId', e.target.value)}
+            >
+              <option value="">Tous</option>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Catégorie
+            <br />
+            <select
+              value={filterValues.categoryId}
+              onChange={(e) => setFilter('categoryId', e.target.value)}
+            >
+              <option value="">Toutes</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Type
+            <br />
+            <select value={filterValues.type} onChange={(e) => setFilter('type', e.target.value)}>
+              <option value="">Tous</option>
+              <option value="expense">Dépenses</option>
+              <option value="income">Revenus</option>
+            </select>
+          </label>
+
+          <label>
+            Recherche
+            <br />
+            <input
+              placeholder="Description…"
+              value={filterValues.search}
+              onChange={(e) => setFilter('search', e.target.value)}
+            />
+          </label>
+
+          <button type="submit">Filtrer</button>
+          <button type="button" onClick={resetFilters}>
+            Réinitialiser
+          </button>
+        </form>
+
+        <p>
+          {transactions.length} opération(s) ·{' '}
+          <span style={{ color: 'green' }}>+ {euros(totalIncome)}</span> ·{' '}
+          <span style={{ color: 'crimson' }}>− {euros(totalExpense)}</span>
+        </p>
 
         {transactions.length === 0 ? (
           <p>Aucune opération pour l'instant.</p>

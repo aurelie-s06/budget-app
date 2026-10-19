@@ -11,3 +11,16 @@ export const transactionValidator = vine.compile(
     categoryId: vine.number().nullable().optional(),
   })
 )
+
+export const transactionFiltersValidator = vine.compile(
+  vine.object({
+    month: vine
+      .string()
+      .regex(/^\d{4}-\d{2}$/)
+      .optional(),
+    accountId: vine.number().optional(),
+    categoryId: vine.number().optional(),
+    type: vine.enum(['income', 'expense']).optional(),
+    search: vine.string().trim().maxLength(100).optional(),
+  })
+)
