@@ -38,5 +38,13 @@ router
     router.post('accounts', [controllers.Accounts, 'store']).as('accounts.store')
     router.put('accounts/:id', [controllers.Accounts, 'update']).as('accounts.update')
     router.delete('accounts/:id', [controllers.Accounts, 'destroy']).as('accounts.destroy')
+
+    // Transactions
+    router.get('transactions', [controllers.Transactions, 'index']).as('transactions.index')
+    router.post('transactions', [controllers.Transactions, 'store']).as('transactions.store')
+    router.put('transactions/:id', [controllers.Transactions, 'update']).as('transactions.update')
+    router
+      .delete('transactions/:id', [controllers.Transactions, 'destroy'])
+      .as('transactions.destroy')
   })
   .use(middleware.auth())
