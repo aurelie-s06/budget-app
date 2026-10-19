@@ -906,3 +906,144 @@ input {
     padding: 20px;
   }
 }
+
+/* ===== Budget app ===== */
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #6366f1;
+  --danger: #dc2626;
+  --radius: 10px;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+h2 {
+  margin-top: 2rem;
+  font-size: 1.15rem;
+}
+
+/* Navigation */
+nav {
+  background: var(--card);
+}
+nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+nav a:hover {
+  color: var(--primary);
+}
+
+/* Formulaires */
+form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+form h2 {
+  margin-top: 0;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+label:has(input[type='radio']) {
+  flex-direction: row;
+  align-items: center;
+  color: var(--text);
+}
+
+input,
+select {
+  font: inherit;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+}
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+input[type='color'] {
+  padding: 0;
+  width: 3rem;
+  height: 2.2rem;
+}
+
+/* Boutons */
+button {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+button:hover {
+  opacity: 0.9;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Boutons discrets dans les listes et tableaux */
+li button,
+td button {
+  background: transparent;
+  color: var(--primary);
+  padding: 0.25rem 0.5rem;
+}
+li button:last-child,
+td button:last-child {
+  color: var(--danger);
+}
+
+/* Listes et tableaux */
+main > ul,
+table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+main > ul {
+  padding: 0 1rem;
+}
+table {
+  overflow: hidden;
+}
+th,
+td {
+  padding: 0.6rem 0.75rem;
+}
+th {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
