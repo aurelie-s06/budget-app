@@ -76,10 +76,12 @@
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
     "better-sqlite3": "^13.0.3",
+    "chart.js": "^4.5.1",
     "edge.js": "^6.5.1",
     "lucide-react": "^1.48.0",
     "luxon": "^3.7.2",
     "react": "^19.3.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.3.0",
     "reflect-metadata": "^0.2.2",
     "sonner": "^2.0.8"

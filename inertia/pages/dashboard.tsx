@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react'
 import MainNav from '~/components/main_nav'
+import ExpensesChart from '~/components/expenses_chart'
 
 type Budget = {
   id: number
@@ -69,6 +70,9 @@ export default function Dashboard(props: Props) {
             value={props.spendingRate !== null ? `${props.spendingRate} %` : '—'}
           />
         </section>
+
+        <h2>Répartition des dépenses</h2>
+        <ExpensesChart items={props.budgets.filter((b) => b.spent > 0)} />
 
         <h2>Budgets du mois</h2>
         {props.budgets.length === 0 ? (
