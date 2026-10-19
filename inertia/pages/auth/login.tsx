@@ -4,15 +4,15 @@ import { Form, Link } from '@adonisjs/inertia/react'
 export default function Login() {
   return (
     <>
-      <h1 className="auth__title">Welcome back</h1>
-      <p className="auth__sub">Sign in to continue building.</p>
+      <h1 className="auth__title">Bon retour</h1>
+      <p className="auth__sub">Connecte-toi pour suivre ton budget.</p>
 
       <Form route="session.store">
         {({ errors, processing }) => (
           <div className="auth__form">
             <div className="field">
               <label className="field__label" htmlFor="email">
-                Email
+                Adresse email
               </label>
               <input
                 id="email"
@@ -20,7 +20,7 @@ export default function Login() {
                 type="email"
                 className="field__input"
                 autoComplete="username"
-                placeholder="you@example.com"
+                placeholder="prenom@exemple.fr"
                 aria-invalid={errors.email ? 'true' : 'false'}
               />
               {errors.email && <span className="field__error">{errors.email}</span>}
@@ -28,7 +28,7 @@ export default function Login() {
 
             <div className="field">
               <label className="field__label" htmlFor="password">
-                Password
+                Mot de passe
               </label>
               <input
                 id="password"
@@ -48,16 +48,16 @@ export default function Login() {
               disabled={processing}
               style={{ marginTop: 4 }}
             >
-              {processing ? 'One moment…' : 'Sign in'}
+              {processing ? 'Connexion…' : 'Se connecter'}
             </button>
           </div>
         )}
       </Form>
 
       <p className="auth__foot">
-        New here?{' '}
+        Pas encore de compte ?{' '}
         <Link route="new_account.create" className="il">
-          Create an account
+          Créer un compte
         </Link>
       </p>
     </>

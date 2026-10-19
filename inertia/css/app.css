@@ -1155,3 +1155,29 @@ select.field__input {
   font-size: 14px;
   color: var(--muted);
 }
+
+.b-brand--lg {
+  font-size: 18px;
+}
+.b-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.b-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.b-features li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--ink);
+  flex: none;
+}
