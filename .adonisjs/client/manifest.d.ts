@@ -4,9 +4,6 @@
  */
 
 /// <reference path="../../adonisrc.ts" />
-/// <reference path="../../config/._auth.ts" />
-/// <reference path="../../config/._hash.ts" />
-/// <reference path="../../config/._logger.ts" />
 /// <reference path="../../config/auth.ts" />
 /// <reference path="../../config/hash.ts" />
 /// <reference path="../../config/logger.ts" />
