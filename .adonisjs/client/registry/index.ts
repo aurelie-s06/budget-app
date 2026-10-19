@@ -72,6 +72,30 @@ const routes = {
     tokens: [[0,"categories"],[1,"id"]],
     types: placeholder as Registry['categories.destroy']['types'],
   },
+  'accounts.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/accounts',
+    tokens: [[0,"accounts"]],
+    types: placeholder as Registry['accounts.index']['types'],
+  },
+  'accounts.store': {
+    methods: ["POST"],
+    pattern: '/accounts',
+    tokens: [[0,"accounts"]],
+    types: placeholder as Registry['accounts.store']['types'],
+  },
+  'accounts.update': {
+    methods: ["PUT"],
+    pattern: '/accounts/:id',
+    tokens: [[0,"accounts"],[1,"id"]],
+    types: placeholder as Registry['accounts.update']['types'],
+  },
+  'accounts.destroy': {
+    methods: ["DELETE"],
+    pattern: '/accounts/:id',
+    tokens: [[0,"accounts"],[1,"id"]],
+    types: placeholder as Registry['accounts.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

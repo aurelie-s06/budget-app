@@ -2,18 +2,15 @@
 |--------------------------------------------------------------------------
 | Routes file
 |--------------------------------------------------------------------------
-|
-| The routes file is used for defining the HTTP routes.
-|
 */
 
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
-import CategoriesController from '#controllers/categories_controller'
 
 router.on('/').renderInertia('home', {}).as('home')
 
+// Pages accessibles uniquement aux visiteurs non connectés
 router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
@@ -24,18 +21,22 @@ router
   })
   .use(middleware.guest())
 
+// Pages accessibles uniquement aux utilisateurs connectés
 router
   .group(() => {
     router.on('/dashboard').renderInertia('dashboard', {}).as('dashboard')
     router.post('logout', [controllers.Session, 'destroy'])
-  })
-  .use(middleware.auth())
 
-router
-  .group(() => {
-    router.get('/categories', [CategoriesController, 'index']).as('categories.index')
-    router.post('/categories', [CategoriesController, 'store']).as('categories.store')
-    router.put('/categories/:id', [CategoriesController, 'update']).as('categories.update')
-    router.delete('/categories/:id', [CategoriesController, 'destroy']).as('categories.destroy')
+    // Catégories
+    router.get('categories', [controllers.Categories, 'index']).as('categories.index')
+    router.post('categories', [controllers.Categories, 'store']).as('categories.store')
+    router.put('categories/:id', [controllers.Categories, 'update']).as('categories.update')
+    router.delete('categories/:id', [controllers.Categories, 'destroy']).as('categories.destroy')
+
+    // Comptes
+    router.get('accounts', [controllers.Accounts, 'index']).as('accounts.index')
+    router.post('accounts', [controllers.Accounts, 'store']).as('accounts.store')
+    router.put('accounts/:id', [controllers.Accounts, 'update']).as('accounts.update')
+    router.delete('accounts/:id', [controllers.Accounts, 'destroy']).as('accounts.destroy')
   })
   .use(middleware.auth())
