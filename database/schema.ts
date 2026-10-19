@@ -7,6 +7,73 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AccountSchema extends BaseModel {
+  static $columns = ['color', 'createdAt', 'id', 'initialBalance', 'name', 'type', 'updatedAt', 'userId'] as const
+  $columns = AccountSchema.$columns
+  @column()
+  declare color: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare initialBalance: number
+  @column()
+  declare name: string
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
+export class CategorySchema extends BaseModel {
+  static $columns = ['color', 'createdAt', 'id', 'monthlyBudget', 'name', 'updatedAt', 'userId'] as const
+  $columns = CategorySchema.$columns
+  @column()
+  declare color: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare monthlyBudget: number | null
+  @column()
+  declare name: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
+export class TransactionSchema extends BaseModel {
+  static $columns = ['accountId', 'amount', 'categoryId', 'createdAt', 'date', 'description', 'id', 'note', 'type', 'updatedAt', 'userId'] as const
+  $columns = TransactionSchema.$columns
+  @column()
+  declare accountId: number
+  @column()
+  declare amount: number
+  @column()
+  declare categoryId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.date()
+  declare date: DateTime
+  @column()
+  declare description: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare note: string | null
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
