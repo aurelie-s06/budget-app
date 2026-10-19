@@ -9,9 +9,11 @@ type Category = {
   monthlyBudget: number | string | null
 }
 
+const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+
 export default function CategoriesIndex({ categories }: { categories: Category[] }) {
   const [editingId, setEditingId] = useState<number | null>(null)
-  const form = useForm({ name: '', color: '#6b7280', monthlyBudget: '' })
+  const form = useForm({ name: '', color: '#6b6f76', monthlyBudget: '' })
 
   function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -33,7 +35,7 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
     setEditingId(c.id)
     form.setData({
       name: c.name,
-      color: c.color ?? '#6b7280',
+      color: c.color ?? '#6b6f76',
       monthlyBudget: c.monthlyBudget?.toString() ?? '',
     })
   }
@@ -44,96 +46,115 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
   }
 
   function remove(c: Category) {
-    if (confirm(`Supprimer la catégorie « ${c.name} » ?`)) {
-      router.delete(`/categories/${c.id}`)
-    }
+    if (confirm(`Supprimer la catégorie « ${c.name} » ?`)) router.delete(`/categories/${c.id}`)
   }
 
   return (
     <>
       <MainNav />
-      <main style={{ maxWidth: 640, margin: '2rem auto', padding: '0 1rem' }}>
-        <h1>Mes catégories</h1>
+      <main className="app-main">
+        <div className="page">
+          <header className="page__header">
+            <div>
+              <h1 className="page__title">Catégories</h1>
+              <p className="page__description">Classe tes dépenses et fixe un budget mensuel.</p>
+            </div>
+          </header>
 
-        <form onSubmit={submit} style={{ display: 'grid', gap: '0.5rem', marginBottom: '2rem' }}>
-          <h2>{editingId ? 'Modifier la catégorie' : 'Nouvelle catégorie'}</h2>
+          <div className="b-split">
+            <section className="panel">
+              {categories.length === 0 ? (
+                <p className="b-empty">Aucune catégorie pour l'instant.</p>
+              ) : (
+                <ul className="b-list">
+                  {categories.map((c) => (
+                    <li key={c.id} className="b-item">
+                      <span className="b-dot" style={{ background: c.color ?? 'var(--subtle)' }} />
+                      <div className="b-item__main">
+                        <div className="b-item__title">{c.name}</div>
+                        <div className="b-item__meta">
+                          {c.monthlyBudget !== null
+                            ? `Budget : ${euros(Number(c.monthlyBudget))} / mois`
+                            : 'Pas de budget'}
+                        </div>
+                      </div>
+                      <div className="b-actions">
+                        <button className="b-link" onClick={() => edit(c)}>
+                          Modifier
+                        </button>
+                        <button className="b-link b-link--danger" onClick={() => remove(c)}>
+                          Supprimer
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
-          <label>
-            Nom
-            <input value={form.data.name} onChange={(e) => form.setData('name', e.target.value)} />
-          </label>
-          {form.errors.name && <p style={{ color: 'crimson' }}>{form.errors.name}</p>}
+            <form className="panel b-form" onSubmit={submit}>
+              <h2 className="section__title">
+                {editingId ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
+              </h2>
 
-          <label>
-            Couleur
-            <input
-              type="color"
-              value={form.data.color}
-              onChange={(e) => form.setData('color', e.target.value)}
-            />
-          </label>
-
-          <label>
-            Budget mensuel (€, facultatif)
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={form.data.monthlyBudget}
-              onChange={(e) => form.setData('monthlyBudget', e.target.value)}
-            />
-          </label>
-          {form.errors.monthlyBudget && (
-            <p style={{ color: 'crimson' }}>{form.errors.monthlyBudget}</p>
-          )}
-
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button type="submit" disabled={form.processing}>
-              {editingId ? 'Enregistrer' : 'Ajouter'}
-            </button>
-            {editingId && (
-              <button type="button" onClick={cancel}>
-                Annuler
-              </button>
-            )}
-          </div>
-        </form>
-
-        {categories.length === 0 ? (
-          <p>Aucune catégorie pour l'instant.</p>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {categories.map((c) => (
-              <li
-                key={c.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.5rem 0',
-                  borderBottom: '1px solid #ddd',
-                }}
-              >
-                <span
-                  style={{
-                    width: 14,
-                    height: 14,
-                    borderRadius: '50%',
-                    background: c.color ?? '#6b7280',
-                  }}
+              <div className="field">
+                <label className="field__label" htmlFor="name">
+                  Nom
+                </label>
+                <input
+                  id="name"
+                  className="field__input"
+                  value={form.data.name}
+                  onChange={(e) => form.setData('name', e.target.value)}
                 />
-                <strong style={{ flex: 1 }}>{c.name}</strong>
-                <span>
-                  {c.monthlyBudget !== null
-                    ? `${Number(c.monthlyBudget).toFixed(2)} € / mois`
-                    : '—'}
-                </span>
-                <button onClick={() => edit(c)}>Modifier</button>
-                <button onClick={() => remove(c)}>Supprimer</button>
-              </li>
-            ))}
-          </ul>
-        )}
+                {form.errors.name && <p className="field__error">{form.errors.name}</p>}
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="color">
+                  Couleur
+                </label>
+                <input
+                  id="color"
+                  type="color"
+                  className="field__input b-color"
+                  value={form.data.color}
+                  onChange={(e) => form.setData('color', e.target.value)}
+                />
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="budget">
+                  Budget mensuel (€)
+                </label>
+                <input
+                  id="budget"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Facultatif"
+                  className="field__input"
+                  value={form.data.monthlyBudget}
+                  onChange={(e) => form.setData('monthlyBudget', e.target.value)}
+                />
+                {form.errors.monthlyBudget && (
+                  <p className="field__error">{form.errors.monthlyBudget}</p>
+                )}
+              </div>
+
+              <div className="b-row">
+                <button type="submit" className="btn btn--primary" disabled={form.processing}>
+                  {editingId ? 'Enregistrer' : 'Ajouter'}
+                </button>
+                {editingId && (
+                  <button type="button" className="btn btn--secondary" onClick={cancel}>
+                    Annuler
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
       </main>
     </>
   )

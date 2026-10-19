@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react'
+import { Link, router, usePage } from '@inertiajs/react'
 
 const links = [
   { href: '/dashboard', label: 'Tableau de bord' },
@@ -8,24 +8,34 @@ const links = [
 ]
 
 export default function MainNav() {
+  const { url } = usePage()
+
   return (
-    <nav
-      style={{
-        display: 'flex',
-        gap: '1rem',
-        alignItems: 'center',
-        padding: '1rem',
-        borderBottom: '1px solid #ddd',
-      }}
-    >
-      {links.map((l) => (
-        <Link key={l.href} href={l.href}>
-          {l.label}
-        </Link>
-      ))}
-      <button style={{ marginLeft: 'auto' }} onClick={() => router.post('/logout')}>
-        Déconnexion
-      </button>
-    </nav>
+    <>
+      <header className="header--bar">
+        <div className="header__inner">
+          <span className="b-brand">Mon Budget</span>
+          <div className="header__right">
+            <button className="btn btn--secondary btn--sm" onClick={() => router.post('/logout')}>
+              Déconnexion
+            </button>
+          </div>
+        </div>
+      </header>
+      <nav className="subnav">
+        <div className="subnav__inner">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="subnav__item"
+              aria-current={url.startsWith(l.href) ? 'page' : undefined}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+    </>
   )
 }

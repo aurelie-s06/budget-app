@@ -17,7 +17,6 @@ const TYPE_LABELS = {
   especes: 'Espèces',
   autre: 'Autre',
 }
-
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 
 export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
@@ -26,7 +25,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
     name: '',
     type: 'courant' as Account['type'],
     initialBalance: '0',
-    color: '#6366f1',
+    color: '#0a0a0b',
   })
 
   const total = accounts.reduce((sum, a) => sum + a.balance, 0)
@@ -50,7 +49,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
       name: a.name,
       type: a.type,
       initialBalance: a.initialBalance.toString(),
-      color: a.color ?? '#6366f1',
+      color: a.color ?? '#0a0a0b',
     })
   }
 
@@ -60,114 +59,131 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
   }
 
   function remove(a: Account) {
-    if (confirm(`Supprimer « ${a.name} » ? Toutes ses opérations seront aussi supprimées.`)) {
+    if (confirm(`Supprimer « ${a.name} » ? Toutes ses opérations seront aussi supprimées.`))
       router.delete(`/accounts/${a.id}`)
-    }
   }
 
-      return (
+  return (
     <>
       <MainNav />
-      <main style={{ maxWidth: 640, margin: '2rem auto', padding: '0 1rem' }}>
-        <h1>Mes comptes</h1>
-        <p>
-          Solde total : <strong>{euros(total)}</strong>
-        </p>
+      <main className="app-main">
+        <div className="page">
+          <header className="page__header">
+            <div>
+              <h1 className="page__title">Comptes</h1>
+              <p className="page__description">Solde total : {euros(total)}</p>
+            </div>
+          </header>
 
-        <form onSubmit={submit} style={{ display: 'grid', gap: '0.5rem', marginBottom: '2rem' }}>
-          <h2>{editingId ? 'Modifier le compte' : 'Nouveau compte'}</h2>
+          <div className="b-split">
+            <section className="panel">
+              {accounts.length === 0 ? (
+                <p className="b-empty">Aucun compte pour l'instant.</p>
+              ) : (
+                <ul className="b-list">
+                  {accounts.map((a) => (
+                    <li key={a.id} className="b-item">
+                      <span className="b-dot" style={{ background: a.color ?? 'var(--ink)' }} />
+                      <div className="b-item__main">
+                        <div className="b-item__title">{a.name}</div>
+                        <div className="b-item__meta">{TYPE_LABELS[a.type]}</div>
+                      </div>
+                      <span className={`b-amount ${a.balance < 0 ? 'b-amount--out' : ''}`}>
+                        {euros(a.balance)}
+                      </span>
+                      <div className="b-actions">
+                        <button className="b-link" onClick={() => edit(a)}>
+                          Modifier
+                        </button>
+                        <button className="b-link b-link--danger" onClick={() => remove(a)}>
+                          Supprimer
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
-          <label>
-            Nom
-            <input value={form.data.name} onChange={(e) => form.setData('name', e.target.value)} />
-          </label>
-          {form.errors.name && <p style={{ color: 'crimson' }}>{form.errors.name}</p>}
+            <form className="panel b-form" onSubmit={submit}>
+              <h2 className="section__title">
+                {editingId ? 'Modifier le compte' : 'Nouveau compte'}
+              </h2>
 
-          <label>
-            Type
-            <select
-              value={form.data.type}
-              onChange={(e) => form.setData('type', e.target.value as Account['type'])}
-            >
-              {Object.entries(TYPE_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label>
-            Solde initial (€)
-            <input
-              type="number"
-              step="0.01"
-              value={form.data.initialBalance}
-              onChange={(e) => form.setData('initialBalance', e.target.value)}
-            />
-          </label>
-          {form.errors.initialBalance && (
-            <p style={{ color: 'crimson' }}>{form.errors.initialBalance}</p>
-          )}
-
-          <label>
-            Couleur
-            <input
-              type="color"
-              value={form.data.color}
-              onChange={(e) => form.setData('color', e.target.value)}
-            />
-          </label>
-
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button type="submit" disabled={form.processing}>
-              {editingId ? 'Enregistrer' : 'Ajouter'}
-            </button>
-            {editingId && (
-              <button type="button" onClick={cancel}>
-                Annuler
-              </button>
-            )}
-          </div>
-        </form>
-
-        {accounts.length === 0 ? (
-          <p>Aucun compte pour l'instant.</p>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {accounts.map((a) => (
-              <li
-                key={a.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  padding: '0.5rem 0',
-                  borderBottom: '1px solid #ddd',
-                }}
-              >
-                <span
-                  style={{
-                    width: 14,
-                    height: 14,
-                    borderRadius: '50%',
-                    background: a.color ?? '#6366f1',
-                  }}
+              <div className="field">
+                <label className="field__label" htmlFor="name">
+                  Nom
+                </label>
+                <input
+                  id="name"
+                  className="field__input"
+                  value={form.data.name}
+                  onChange={(e) => form.setData('name', e.target.value)}
                 />
-                <div style={{ flex: 1 }}>
-                  <strong>{a.name}</strong>
-                  <br />
-                  <small>{TYPE_LABELS[a.type]}</small>
-                </div>
-                <strong style={{ color: a.balance < 0 ? 'crimson' : undefined }}>
-                  {euros(a.balance)}
-                </strong>
-                <button onClick={() => edit(a)}>Modifier</button>
-                <button onClick={() => remove(a)}>Supprimer</button>
-              </li>
-            ))}
-          </ul>
-        )}
+                {form.errors.name && <p className="field__error">{form.errors.name}</p>}
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="type">
+                  Type
+                </label>
+                <select
+                  id="type"
+                  className="field__input"
+                  value={form.data.type}
+                  onChange={(e) => form.setData('type', e.target.value as Account['type'])}
+                >
+                  {Object.entries(TYPE_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="balance">
+                  Solde initial (€)
+                </label>
+                <input
+                  id="balance"
+                  type="number"
+                  step="0.01"
+                  className="field__input"
+                  value={form.data.initialBalance}
+                  onChange={(e) => form.setData('initialBalance', e.target.value)}
+                />
+                {form.errors.initialBalance && (
+                  <p className="field__error">{form.errors.initialBalance}</p>
+                )}
+              </div>
+
+              <div className="field">
+                <label className="field__label" htmlFor="color">
+                  Couleur
+                </label>
+                <input
+                  id="color"
+                  type="color"
+                  className="field__input b-color"
+                  value={form.data.color}
+                  onChange={(e) => form.setData('color', e.target.value)}
+                />
+              </div>
+
+              <div className="b-row">
+                <button type="submit" className="btn btn--primary" disabled={form.processing}>
+                  {editingId ? 'Enregistrer' : 'Ajouter'}
+                </button>
+                {editingId && (
+                  <button type="button" className="btn btn--secondary" onClick={cancel}>
+                    Annuler
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
       </main>
     </>
   )

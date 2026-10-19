@@ -21,5 +21,9 @@ declare module '@adonisjs/inertia/types' {
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
     'transactions/index': ExtractProps<(typeof import('../../inertia/pages/transactions/index.tsx'))['default']>
+    '._dashboard': ExtractProps<(typeof import('../../inertia/pages/._dashboard.tsx'))['default']>
+    'categories/._index': ExtractProps<(typeof import('../../inertia/pages/categories/._index.tsx'))['default']>
+    'accounts/._index': ExtractProps<(typeof import('../../inertia/pages/accounts/._index.tsx'))['default']>
+    'transactions/._index': ExtractProps<(typeof import('../../inertia/pages/transactions/._index.tsx'))['default']>
   }
 }
