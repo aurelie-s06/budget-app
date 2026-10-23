@@ -28,6 +28,10 @@ export interface ApiDefinition {
     update: typeof routes['accounts.update']
     destroy: typeof routes['accounts.destroy']
   }
+  savingsGoal: {
+    update: typeof routes['savings_goal.update']
+    destroy: typeof routes['savings_goal.destroy']
+  }
   transactions: {
     index: typeof routes['transactions.index']
     store: typeof routes['transactions.store']

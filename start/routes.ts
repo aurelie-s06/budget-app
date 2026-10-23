@@ -42,6 +42,10 @@ router
     router.put('accounts/:id', [controllers.Accounts, 'update']).as('accounts.update')
     router.delete('accounts/:id', [controllers.Accounts, 'destroy']).as('accounts.destroy')
 
+    // Objectif d'épargne
+    router.put('savings-goal', [controllers.SavingsGoals, 'update']).as('savings_goal.update')
+    router.delete('savings-goal', [controllers.SavingsGoals, 'destroy']).as('savings_goal.destroy')
+
     // Transactions
     router.get('transactions', [controllers.Transactions, 'index']).as('transactions.index')
     router.post('transactions', [controllers.Transactions, 'store']).as('transactions.store')

@@ -47,6 +47,27 @@ export class CategorySchema extends BaseModel {
   declare userId: number
 }
 
+export class SavingsGoalSchema extends BaseModel {
+  static $columns = ['createdAt', 'deadline', 'id', 'name', 'startDate', 'targetAmount', 'updatedAt', 'userId'] as const
+  $columns = SavingsGoalSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.date()
+  declare deadline: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare name: string
+  @column.date()
+  declare startDate: DateTime
+  @column()
+  declare targetAmount: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class TransactionSchema extends BaseModel {
   static $columns = ['accountId', 'amount', 'categoryId', 'createdAt', 'date', 'description', 'id', 'note', 'type', 'updatedAt', 'userId'] as const
   $columns = TransactionSchema.$columns

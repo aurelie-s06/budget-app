@@ -8,3 +8,10 @@ export const monthValidator = vine.compile(
       .optional(),
   })
 )
+
+// Période des graphiques du tableau de bord
+export const periodValidator = vine.compile(
+  vine.object({
+    period: vine.enum(['6', '12', 'all']).optional(),
+  })
+)

@@ -1527,3 +1527,294 @@ select.field__input {
 .b-logo:hover svg {
   rotate: -8deg;
 }
+
+/* ==========================================================================
+   Tableau de bord : grille de tuiles
+   ========================================================================== */
+.b-dash {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+.b-span-4 {
+  grid-column: span 4;
+}
+.b-span-6 {
+  grid-column: span 6;
+}
+.b-span-8 {
+  grid-column: span 8;
+}
+@media (max-width: 1000px) {
+  .b-span-4 {
+    grid-column: span 6;
+  }
+  .b-span-8 {
+    grid-column: span 12;
+  }
+}
+@media (max-width: 720px) {
+  .b-span-4,
+  .b-span-6 {
+    grid-column: span 12;
+  }
+}
+
+.b-tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 22px;
+  background: var(--card);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+}
+.b-tile__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.b-tile__head .b-link {
+  margin: -4px -8px 0 0;
+}
+.b-tile__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.b-tile > .b-tile__label {
+  margin-bottom: 6px;
+}
+.b-tile__head .b-tile__label {
+  margin: 0;
+}
+.b-tile__value {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.b-tile__hint {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.b-tile__hint .b-link {
+  padding: 2px 4px;
+  margin-left: -4px;
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Sélecteur de période */
+.b-segment {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+}
+.b-segment button {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.b-segment button:hover {
+  color: var(--ink);
+}
+.b-segment button[aria-pressed='true'] {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Chiffres du mois */
+.b-figures {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: -6px;
+}
+.b-figures > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.b-figures dt {
+  color: var(--muted);
+}
+.b-figures dd {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.b-figures__total {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+.b-figures__total dd {
+  font-weight: 600;
+}
+.b-rate {
+  margin-top: auto;
+  padding-top: 14px;
+}
+.b-rate .b-bar {
+  margin-top: 0;
+}
+
+/* Objectif d'épargne */
+.b-goal {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.b-goal__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.b-goal__name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.b-goal__percent {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.b-goal .b-tile__value {
+  font-size: 24px;
+}
+.b-goal__target {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.b-goal__bar {
+  height: 8px;
+}
+.b-goal__bar .b-bar__fill {
+  background: var(--in);
+}
+.b-goal__actions {
+  margin: auto -8px -4px auto;
+  padding-top: 8px;
+}
+.b-goal--empty {
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.b-goal-form {
+  gap: 12px;
+}
+.b-goal-form .b-row .field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Graphiques des tuiles */
+.b-tile .b-chart-bar {
+  height: 260px;
+}
+.b-chart-line {
+  position: relative;
+  height: 220px;
+}
+
+/* Calendrier des dépenses */
+.b-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 340px;
+}
+.b-cal__weekday {
+  font-size: 11px;
+  text-align: center;
+  color: var(--subtle);
+}
+.b-cal__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.b-cal__day--l0 {
+  background: var(--line);
+}
+.b-cal__day--l1 {
+  background: color-mix(in srgb, var(--out) 18%, var(--card));
+}
+.b-cal__day--l2 {
+  background: color-mix(in srgb, var(--out) 40%, var(--card));
+}
+.b-cal__day--l3 {
+  background: color-mix(in srgb, var(--out) 65%, var(--card));
+  color: #fff;
+}
+.b-cal__day--l4 {
+  background: var(--out);
+  color: #fff;
+}
+.b-cal__day--future {
+  background: transparent;
+  border: 1px dashed var(--line-2);
+  color: var(--subtle);
+}
+.b-cal__day--today {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.b-cal__legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.b-cal__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.b-cal__legend .b-cal__swatch:first-of-type {
+  margin-left: 4px;
+}
+.b-cal__legend .b-cal__swatch:last-of-type {
+  margin-right: 4px;
+}
+.b-cal__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.b-cal__facts dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+.b-cal__facts dd {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}

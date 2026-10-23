@@ -20,6 +20,8 @@ export type ScannedRoutes = {
     'accounts.store': { paramsTuple?: []; params?: {} }
     'accounts.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'savings_goal.update': { paramsTuple?: []; params?: {} }
+    'savings_goal.destroy': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
     'transactions.store': { paramsTuple?: []; params?: {} }
     'transactions.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -56,11 +58,13 @@ export type ScannedRoutes = {
   PUT: {
     'categories.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'accounts.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'savings_goal.update': { paramsTuple?: []; params?: {} }
     'transactions.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'categories.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'savings_goal.destroy': { paramsTuple?: []; params?: {} }
     'transactions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }

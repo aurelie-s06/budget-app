@@ -11,4 +11,5 @@ export const controllers = {
   NewAccount: () => import('#controllers/new_account_controller'),
   Session: () => import('#controllers/session_controller'),
   Transactions: () => import('#controllers/transactions_controller'),
+  SavingsGoals: () => import('#controllers/savings_goals_controller'),
 }

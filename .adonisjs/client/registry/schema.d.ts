@@ -215,6 +215,32 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/accounts_controller').default['destroy']>>>
     }
   }
+  'savings_goal.update': {
+    methods: ["PUT"]
+    pattern: '/savings-goal'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/savings_goal').savingsGoalValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/savings_goal').savingsGoalValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/savings_goals_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/savings_goals_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/savings_goals_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'savings_goal.destroy': {
+    methods: ["DELETE"]
+    pattern: '/savings-goal'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/savings_goals_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/savings_goals_controller').default['destroy']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/savings_goals_controller').default['destroy']>>>
+    }
+  }
   'transactions.index': {
     methods: ["GET","HEAD"]
     pattern: '/transactions'

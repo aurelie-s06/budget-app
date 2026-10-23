@@ -102,6 +102,18 @@ const routes = {
     tokens: [[0,"accounts"],[1,"id"]],
     types: placeholder as Registry['accounts.destroy']['types'],
   },
+  'savings_goal.update': {
+    methods: ["PUT"],
+    pattern: '/savings-goal',
+    tokens: [[0,"savings-goal"]],
+    types: placeholder as Registry['savings_goal.update']['types'],
+  },
+  'savings_goal.destroy': {
+    methods: ["DELETE"],
+    pattern: '/savings-goal',
+    tokens: [[0,"savings-goal"]],
+    types: placeholder as Registry['savings_goal.destroy']['types'],
+  },
   'transactions.index': {
     methods: ["GET","HEAD"],
     pattern: '/transactions',
