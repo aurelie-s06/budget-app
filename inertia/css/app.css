@@ -1071,6 +1071,33 @@ select.field__input {
 .b-item:last-child {
   padding-bottom: 0;
 }
+/* Opération en cours de modification, dans une liste */
+.b-item--edit {
+  display: block;
+}
+.b-form--inline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  padding: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.b-form--inline > .section__title,
+.b-form--inline > .b-toggle,
+.b-form--inline > .b-row {
+  grid-column: 1 / -1;
+}
+.b-form--inline .b-toggle {
+  background: var(--card);
+}
+.b-add-form {
+  margin-bottom: 16px;
+}
+.b-panel-head .b-actions {
+  align-items: center;
+}
 .b-item__main {
   flex: 1;
   min-width: 0;
@@ -1144,6 +1171,23 @@ select.field__input {
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+}
+.b-stat__hint {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+/* Vue mensuelle : 2 lignes de 3 (revenus, puis dépenses / épargne / taux) */
+.b-stats--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.b-stats--3 + .b-stats--3 {
+  margin-top: -12px;
+}
+@media (max-width: 720px) {
+  .b-stats--3 {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Barres de budget */
@@ -1466,6 +1510,9 @@ select.field__input {
   .b-item .b-actions {
     width: 100%;
     justify-content: flex-end;
+  }
+  .b-form--inline {
+    grid-template-columns: 1fr;
   }
   .b-landing__header .btn--ghost {
     display: none;

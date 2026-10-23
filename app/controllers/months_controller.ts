@@ -13,12 +13,16 @@ export default class MonthsController {
     const month = parsed?.isValid ? parsed : DateTime.now().startOf('month')
 
     const summary = await monthSummary(user, month)
+    // Pour modifier une opération directement depuis le mois
+    const accounts = await user.related('accounts').query().orderBy('name')
+    const categories = await user.related('categories').query().orderBy('name')
 
     return inertia.render('months/show', {
       month: month.toFormat('yyyy-MM'),
       previous: month.minus({ months: 1 }).toFormat('yyyy-MM'),
       next: month.plus({ months: 1 }).toFormat('yyyy-MM'),
-      isCurrent: month.hasSame(DateTime.now(), 'month'),
+      accounts: accounts.map((a) => ({ id: a.id, name: a.name })),
+      categories: categories.map((c) => ({ id: c.id, name: c.name })),
       ...summary,
     })
   }

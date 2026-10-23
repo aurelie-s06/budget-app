@@ -41,6 +41,10 @@ export default class TransactionsController {
     const accounts = await user.related('accounts').query().orderBy('name')
     const categories = await user.related('categories').query().orderBy('name')
 
+    // Mois ayant au moins une opération, pour la liste déroulante du filtre
+    const dates = await user.related('transactions').query().select('date').orderBy('date', 'desc')
+    const months = [...new Set(dates.map((t) => t.date.toFormat('yyyy-MM')))]
+
     return inertia.render('transactions/index', {
       transactions: transactions.map((t) => ({
         id: t.id,
@@ -57,6 +61,7 @@ export default class TransactionsController {
       })),
       accounts: accounts.map((a) => ({ id: a.id, name: a.name })),
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
+      months,
       filters: {
         month: filters.month ?? '',
         accountId: filters.accountId?.toString() ?? '',

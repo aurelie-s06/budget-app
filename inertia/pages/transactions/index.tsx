@@ -1,7 +1,8 @@
-import { Head, useForm, router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import TransactionForm from '~/components/transaction_form'
 
 type Transaction = {
   id: number
@@ -28,25 +29,24 @@ type Props = {
   transactions: Transaction[]
   accounts: Option[]
   categories: Option[]
+  months: string[]
   filters: Filters
 }
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-const today = () => new Date().toISOString().slice(0, 10)
+// "2026-04" -> "avril 2026"
+const monthLabel = (m: string) =>
+  new Date(`${m}-01`).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
 const EMPTY_FILTERS: Filters = { month: '', accountId: '', categoryId: '', type: '', search: '' }
 
-export default function TransactionsIndex({ transactions, accounts, categories, filters }: Props) {
+export default function TransactionsIndex({
+  transactions,
+  accounts,
+  categories,
+  months,
+  filters,
+}: Props) {
   const [editingId, setEditingId] = useState<number | null>(null)
-  const emptyForm = {
-    type: 'expense' as Transaction['type'],
-    amount: '',
-    date: today(),
-    description: '',
-    note: '',
-    accountId: accounts[0]?.id.toString() ?? '',
-    categoryId: '',
-  }
-  const form = useForm(emptyForm)
   const [filterValues, setFilterValues] = useState<Filters>(filters)
 
   const header = (
@@ -80,43 +80,6 @@ export default function TransactionsIndex({ transactions, accounts, categories, 
         <Footer />
       </>
     )
-  }
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault()
-    form.transform((data) => ({
-      ...data,
-      amount: Number(data.amount),
-      accountId: Number(data.accountId),
-      categoryId: data.categoryId === '' ? null : Number(data.categoryId),
-      note: data.note === '' ? null : data.note,
-    }))
-    const options = {
-      onSuccess: () => {
-        form.setData(emptyForm)
-        setEditingId(null)
-      },
-    }
-    if (editingId) form.put(`/transactions/${editingId}`, options)
-    else form.post('/transactions', options)
-  }
-
-  function edit(t: Transaction) {
-    setEditingId(t.id)
-    form.setData({
-      type: t.type,
-      amount: t.amount.toString(),
-      date: t.date,
-      description: t.description,
-      note: t.note ?? '',
-      accountId: t.accountId.toString(),
-      categoryId: t.categoryId?.toString() ?? '',
-    })
-  }
-
-  function cancel() {
-    setEditingId(null)
-    form.setData(emptyForm)
   }
 
   function remove(t: Transaction) {
@@ -163,13 +126,20 @@ export default function TransactionsIndex({ transactions, accounts, categories, 
                   <label className="field__label" htmlFor="f-month">
                     Mois
                   </label>
-                  <input
+                  {/* Liste plutôt que <input type="month">, non géré par Safari */}
+                  <select
                     id="f-month"
-                    type="month"
                     className="field__input"
                     value={filterValues.month}
                     onChange={(e) => setFilter('month', e.target.value)}
-                  />
+                  >
+                    <option value="">Tous</option>
+                    {months.map((m) => (
+                      <option key={m} value={m}>
+                        {monthLabel(m)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="f-account">
@@ -298,7 +268,7 @@ export default function TransactionsIndex({ transactions, accounts, categories, 
                           </td>
                           <td>
                             <div className="b-actions" style={{ justifyContent: 'flex-end' }}>
-                              <button className="b-link" onClick={() => edit(t)}>
+                              <button className="b-link" onClick={() => setEditingId(t.id)}>
                                 Modifier
                               </button>
                               <button className="b-link b-link--danger" onClick={() => remove(t)}>
@@ -314,134 +284,15 @@ export default function TransactionsIndex({ transactions, accounts, categories, 
               )}
             </section>
 
-            <form className="panel b-form" onSubmit={submit}>
-              <h2 className="section__title">
-                {editingId ? "Modifier l'opération" : 'Nouvelle opération'}
-              </h2>
-
-              <div className="b-toggle">
-                <button
-                  type="button"
-                  aria-pressed={form.data.type === 'expense'}
-                  onClick={() => form.setData('type', 'expense')}
-                >
-                  Dépense
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={form.data.type === 'income'}
-                  onClick={() => form.setData('type', 'income')}
-                >
-                  Revenu
-                </button>
-              </div>
-
-              <div className="field">
-                <label className="field__label" htmlFor="description">
-                  Description
-                </label>
-                <input
-                  id="description"
-                  className="field__input"
-                  value={form.data.description}
-                  onChange={(e) => form.setData('description', e.target.value)}
-                />
-                {form.errors.description && (
-                  <p className="field__error">{form.errors.description}</p>
-                )}
-              </div>
-
-              <div className="field">
-                <label className="field__label" htmlFor="amount">
-                  Montant (€)
-                </label>
-                <input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  className="field__input"
-                  value={form.data.amount}
-                  onChange={(e) => form.setData('amount', e.target.value)}
-                />
-                {form.errors.amount && <p className="field__error">{form.errors.amount}</p>}
-              </div>
-
-              <div className="field">
-                <label className="field__label" htmlFor="date">
-                  Date
-                </label>
-                <input
-                  id="date"
-                  type="date"
-                  className="field__input"
-                  value={form.data.date}
-                  onChange={(e) => form.setData('date', e.target.value)}
-                />
-                {form.errors.date && <p className="field__error">{form.errors.date}</p>}
-              </div>
-
-              <div className="field">
-                <label className="field__label" htmlFor="account">
-                  Compte
-                </label>
-                <select
-                  id="account"
-                  className="field__input"
-                  value={form.data.accountId}
-                  onChange={(e) => form.setData('accountId', e.target.value)}
-                >
-                  {accounts.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="field">
-                <label className="field__label" htmlFor="category">
-                  Catégorie
-                </label>
-                <select
-                  id="category"
-                  className="field__input"
-                  value={form.data.categoryId}
-                  onChange={(e) => form.setData('categoryId', e.target.value)}
-                >
-                  <option value="">Aucune</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="field">
-                <label className="field__label" htmlFor="note">
-                  Note
-                </label>
-                <input
-                  id="note"
-                  className="field__input"
-                  placeholder="Facultatif"
-                  value={form.data.note}
-                  onChange={(e) => form.setData('note', e.target.value)}
-                />
-              </div>
-
-              <div className="b-row">
-                <button type="submit" className="btn btn--primary" disabled={form.processing}>
-                  {editingId ? 'Enregistrer' : 'Ajouter'}
-                </button>
-                {editingId && (
-                  <button type="button" className="btn btn--secondary" onClick={cancel}>
-                    Annuler
-                  </button>
-                )}
-              </div>
-            </form>
+            <TransactionForm
+              key={editingId ?? 'new'}
+              transaction={transactions.find((t) => t.id === editingId)}
+              accounts={accounts}
+              categories={categories}
+              className="panel b-form"
+              onDone={() => setEditingId(null)}
+              onCancel={editingId ? () => setEditingId(null) : undefined}
+            />
           </div>
         </div>
       </main>

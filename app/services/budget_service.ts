@@ -22,6 +22,10 @@ export async function monthSummary(user: User, month: DateTime) {
   const income = transactions
     .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount), 0)
+  // Salaire : revenus rangés dans la catégorie « Salaire »
+  const salary = transactions
+    .filter((t) => t.type === 'income' && t.category?.name.trim().toLowerCase() === 'salaire')
+    .reduce((sum, t) => sum + Number(t.amount), 0)
   const expenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount), 0)
@@ -56,6 +60,8 @@ export async function monthSummary(user: User, month: DateTime) {
 
   return {
     income: round(income),
+    salary: round(salary),
+    otherIncome: round(income - salary),
     expenses: round(expenses),
     savings: round(income - expenses),
     spendingRate,
@@ -67,6 +73,9 @@ export async function monthSummary(user: User, month: DateTime) {
       amount: Number(t.amount),
       date: t.date.toISODate() ?? '',
       description: t.description,
+      note: t.note,
+      accountId: t.accountId,
+      categoryId: t.categoryId,
       categoryName: t.category?.name ?? null,
       categoryColor: t.category?.color ?? null,
     })),
