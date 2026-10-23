@@ -1,8 +1,10 @@
+import { Head } from '@inertiajs/react'
 import Footer from '~/components/footer'
 
 export default function NotFound() {
   return (
     <div className="b-landing">
+      <Head title="Page introuvable" />
       <main className="home">
         <article className="prose-card">
           <div className="pc-top">

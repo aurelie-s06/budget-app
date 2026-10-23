@@ -1,4 +1,4 @@
-import { useForm, router } from '@inertiajs/react'
+import { Head, useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
@@ -52,6 +52,7 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
 
   return (
     <>
+      <Head title="Catégories" />
       <MainNav />
       <main className="app-main">
         <div className="page">

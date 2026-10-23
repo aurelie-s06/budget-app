@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { Link } from '@inertiajs/react'
+import Logo from '~/components/logo'
 import Footer from '~/components/footer'
 import FlashToasts from '~/components/flash_toasts'
 import ThemeToggle from '~/components/theme_toggle'
@@ -10,9 +10,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="auth">
         <div className="auth__form-col">
           <div className="auth__form-top">
-            <Link href="/" className="b-brand b-brand--lg">
-              Mon Budget
-            </Link>
+            <Logo />
             <span className="auth__toggle-mobile">
               <ThemeToggle />
             </span>

@@ -1,4 +1,4 @@
-import { useForm, router } from '@inertiajs/react'
+import { Head, useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
@@ -61,6 +61,7 @@ export default function TransactionsIndex({ transactions, accounts, categories, 
   if (accounts.length === 0) {
     return (
       <>
+        <Head title="Opérations" />
         <MainNav />
         <main className="app-main">
           <div className="page">
@@ -149,6 +150,7 @@ export default function TransactionsIndex({ transactions, accounts, categories, 
 
   return (
     <>
+      <Head title="Opérations" />
       <MainNav />
       <main className="app-main">
         <div className="page">

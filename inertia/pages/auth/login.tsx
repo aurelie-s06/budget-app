@@ -1,9 +1,11 @@
 import AuthLayout from '~/layouts/auth'
+import { Head } from '@inertiajs/react'
 import { Form, Link } from '@adonisjs/inertia/react'
 
 export default function Login() {
   return (
     <>
+      <Head title="Connexion" />
       <h1 className="auth__title">Bon retour</h1>
       <p className="auth__sub">Connecte-toi pour suivre ton budget.</p>
 

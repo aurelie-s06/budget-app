@@ -1,8 +1,10 @@
+import { Head } from '@inertiajs/react'
 import Footer from '~/components/footer'
 
 export default function ServerError() {
   return (
     <div className="b-landing">
+      <Head title="Erreur" />
       <main className="home">
         <article className="prose-card">
           <div className="pc-top">

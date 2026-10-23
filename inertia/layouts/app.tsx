@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <>
       <header className="header header--bar">
         <div className="header__inner">
-          <Logo size={28} />
+          <Logo href="/dashboard" />
           <div className="header__right">
             <ThemeToggle />
             <Form route="session.destroy">

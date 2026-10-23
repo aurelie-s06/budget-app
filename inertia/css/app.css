@@ -955,10 +955,13 @@ input {
 :root {
   --in: #18794e;
   --out: #c0392b;
+  /* vert du logo : contraste avec le carré, qui s'inverse avec le thème */
+  --in-mark: #3ecf8e;
 }
 :root[data-theme='dark'] {
   --in: #3ecf8e;
   --out: #e0685c;
+  --in-mark: #18794e;
 }
 
 .b-brand {
@@ -1467,4 +1470,21 @@ select.field__input {
   .b-landing__header .btn--ghost {
     display: none;
   }
+}
+
+.b-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.b-logo svg {
+  flex: none;
+  transition: rotate 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+.b-logo:hover svg {
+  rotate: -8deg;
 }

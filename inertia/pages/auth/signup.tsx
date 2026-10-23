@@ -1,9 +1,11 @@
 import AuthLayout from '~/layouts/auth'
+import { Head } from '@inertiajs/react'
 import { Form, Link } from '@adonisjs/inertia/react'
 
 export default function Signup() {
   return (
     <>
+      <Head title="Inscription" />
       <h1 className="auth__title">Crée ton compte</h1>
       <p className="auth__sub">Quelques secondes suffisent pour commencer à suivre ton budget.</p>
 

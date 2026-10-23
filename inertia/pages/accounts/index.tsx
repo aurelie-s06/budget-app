@@ -1,4 +1,4 @@
-import { useForm, router } from '@inertiajs/react'
+import { Head, useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
@@ -66,6 +66,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
 
   return (
     <>
+      <Head title="Comptes" />
       <MainNav />
       <main className="app-main">
         <div className="page">

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Head, Link } from '@inertiajs/react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import Stat from '~/components/stat'
@@ -32,6 +32,7 @@ export default function Dashboard(props: Props) {
 
   return (
     <>
+      <Head title="Tableau de bord" />
       <MainNav />
       <main className="app-main">
         <div className="page">

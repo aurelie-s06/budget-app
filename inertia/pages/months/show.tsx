@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Head, Link } from '@inertiajs/react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
@@ -47,6 +47,7 @@ export default function MonthShow(props: Props) {
 
   return (
     <>
+      <Head title={title} />
       <MainNav />
       <main className="app-main">
         <div className="page">

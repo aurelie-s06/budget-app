@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react'
+import Logo from '~/components/logo'
 import Footer from '~/components/footer'
 import ThemeToggle from '~/components/theme_toggle'
 
@@ -8,7 +9,7 @@ export default function Home() {
   return (
     <div className="b-landing">
       <header className="b-landing__header">
-        <span className="b-brand b-brand--lg">Mon Budget</span>
+        <Logo />
         <div className="header__right">
           <ThemeToggle />
           <Link href="/login" className="btn btn--ghost">
