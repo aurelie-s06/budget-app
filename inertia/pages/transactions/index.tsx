@@ -2,18 +2,11 @@ import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
-import TransactionForm from '~/components/transaction_form'
+import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
 
-type Transaction = {
-  id: number
-  type: 'income' | 'expense'
-  amount: number
-  date: string
-  description: string
-  note: string | null
-  accountId: number
-  categoryId: number | null
+type Transaction = EditableTransaction & {
   accountName: string
+  toAccountName: string | null
   categoryName: string | null
   categoryColor: string | null
 }
@@ -27,7 +20,7 @@ type Filters = {
 }
 type Props = {
   transactions: Transaction[]
-  accounts: Option[]
+  accounts: (Option & { type: string })[]
   categories: Option[]
   months: string[]
   filters: Filters
@@ -37,6 +30,12 @@ const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', curr
 // "2026-04" -> "avril 2026"
 const monthLabel = (m: string) =>
   new Date(`${m}-01`).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+// Signe et couleur du montant selon le type d'opération
+const AMOUNT = {
+  income: { sign: '+', className: 'b-amount--in' },
+  expense: { sign: '−', className: 'b-amount--out' },
+  transfer: { sign: '⇄', className: 'b-amount--move' },
+}
 const EMPTY_FILTERS: Filters = { month: '', accountId: '', categoryId: '', type: '', search: '' }
 
 export default function TransactionsIndex({
@@ -53,7 +52,7 @@ export default function TransactionsIndex({
     <header className="page__header">
       <div>
         <h1 className="page__title">Opérations</h1>
-        <p className="page__description">Tes revenus et dépenses, compte par compte.</p>
+        <p className="page__description">Tes revenus, dépenses et virements, compte par compte.</p>
       </div>
     </header>
   )
@@ -190,6 +189,7 @@ export default function TransactionsIndex({
                     <option value="">Tous</option>
                     <option value="expense">Dépenses</option>
                     <option value="income">Revenus</option>
+                    <option value="transfer">Virements</option>
                   </select>
                 </div>
                 <div className="field">
@@ -230,7 +230,7 @@ export default function TransactionsIndex({
                         <th>Date</th>
                         <th>Description</th>
                         <th className="b-num">Montant</th>
-                        <th></th>
+                        <th />
                       </tr>
                     </thead>
                     <tbody>
@@ -258,13 +258,13 @@ export default function TransactionsIndex({
                                   {t.categoryName} ·
                                 </>
                               )}
-                              {t.accountName}
+                              {t.type === 'transfer'
+                                ? `${t.accountName} → ${t.toAccountName}`
+                                : t.accountName}
                             </div>
                           </td>
-                          <td
-                            className={`b-num b-amount b-amount--${t.type === 'income' ? 'in' : 'out'}`}
-                          >
-                            {t.type === 'income' ? '+' : '−'} {euros(t.amount)}
+                          <td className={`b-num b-amount ${AMOUNT[t.type].className}`}>
+                            {AMOUNT[t.type].sign} {euros(t.amount)}
                           </td>
                           <td>
                             <div className="b-actions" style={{ justifyContent: 'flex-end' }}>

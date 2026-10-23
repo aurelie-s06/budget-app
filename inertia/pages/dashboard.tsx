@@ -17,6 +17,7 @@ type Props = {
   income: number
   expenses: number
   savings: number
+  rest: number
   spendingRate: number | null
   budgets: Budget[]
   uncategorized: number
@@ -113,11 +114,15 @@ export default function Dashboard(props: Props) {
                   <dt>Dépenses</dt>
                   <dd className="b-amount--out">− {euros(props.expenses)}</dd>
                 </div>
-                <div className="b-figures__total">
+                <div>
                   <dt>Épargne</dt>
-                  <dd className={props.savings < 0 ? 'b-amount--out' : ''}>
-                    {euros(props.savings)}
+                  <dd className="b-amount--move">
+                    {props.savings < 0 ? '+' : '−'} {euros(Math.abs(props.savings))}
                   </dd>
+                </div>
+                <div className="b-figures__total">
+                  <dt>Reste</dt>
+                  <dd className={props.rest < 0 ? 'b-amount--out' : ''}>{euros(props.rest)}</dd>
                 </div>
               </dl>
               {rate !== null && (
@@ -184,7 +189,7 @@ export default function Dashboard(props: Props) {
                 <div>
                   <h2 className="section__title">Épargne par mois</h2>
                   <p className="section__description">
-                    Ce qu’il reste une fois les dépenses payées.
+                    Virements vers tes comptes épargne, moins les retraits.
                   </p>
                 </div>
               </header>

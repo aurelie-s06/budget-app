@@ -12,7 +12,7 @@ const label = (month: string) =>
   new Date(`${month}-01`).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
 
 /**
- * Épargne de chaque mois (revenus - dépenses) : vert si positive, rouge sinon.
+ * Épargne versée chaque mois sur les comptes épargne : vert si positive, rouge sinon.
  * Un clic sur un mois ouvre sa vue détaillée.
  */
 export default function SavingsChart({ months }: { months: Month[] }) {

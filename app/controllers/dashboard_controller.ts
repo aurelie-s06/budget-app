@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import {
+  accountBalances,
   dailyExpenses,
   monthSummary,
   monthlyHistory,
@@ -18,13 +19,8 @@ export default class DashboardController {
     const now = DateTime.now()
 
     // Solde total de tous les comptes
-    const accounts = await user.related('accounts').query().preload('transactions')
-    const totalBalance = accounts.reduce((total, a) => {
-      return a.transactions.reduce(
-        (sum, t) => (t.type === 'income' ? sum + Number(t.amount) : sum - Number(t.amount)),
-        total + Number(a.initialBalance)
-      )
-    }, 0)
+    const balances = await accountBalances(user)
+    const totalBalance = balances.reduce((sum, b) => sum + b.balance, 0)
 
     // Chiffres du mois en cours
     const summary = await monthSummary(user, now)
@@ -32,10 +28,11 @@ export default class DashboardController {
     return inertia.render('dashboard', {
       period,
       totalBalance: round(totalBalance),
-      accountCount: accounts.length,
+      accountCount: balances.length,
       income: summary.income,
       expenses: summary.expenses,
       savings: summary.savings,
+      rest: summary.rest,
       spendingRate: summary.spendingRate,
       budgets: summary.budgets,
       uncategorized: summary.uncategorized,

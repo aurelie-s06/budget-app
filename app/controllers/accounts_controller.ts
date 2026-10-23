@@ -1,26 +1,22 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { accountValidator } from '#validators/account'
+import { accountBalances } from '#services/budget_service'
 
 export default class AccountsController {
   async index({ auth, inertia }: HttpContext) {
     const user = auth.getUserOrFail()
-    const accounts = await user.related('accounts').query().preload('transactions').orderBy('name')
+    // Solde = solde initial + revenus − dépenses ± virements
+    const balances = await accountBalances(user)
 
     return inertia.render('accounts/index', {
-      accounts: accounts.map((a) => {
-        // Solde = solde initial + revenus - dépenses
-        const balance = a.transactions.reduce((total, t) => {
-          const amount = Number(t.amount)
-          return t.type === 'income' ? total + amount : total - amount
-        }, Number(a.initialBalance))
-
+      accounts: balances.map(({ account: a, balance }) => {
         return {
           id: a.id,
           name: a.name,
           type: a.type as 'courant' | 'epargne' | 'especes' | 'autre',
           color: a.color,
           initialBalance: Number(a.initialBalance),
-          balance: Math.round(balance * 100) / 100,
+          balance,
         }
       }),
     })

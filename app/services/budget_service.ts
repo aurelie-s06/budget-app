@@ -4,18 +4,69 @@ import SavingsGoal from '#models/savings_goal'
 
 const round = (n: number) => Math.round(n * 100) / 100
 
+type Movement = { type: string; amount: number; accountId: number; toAccountId: number | null }
+
 /**
- * Chiffres clés d'un mois : revenus, dépenses, épargne, taux de dépenses,
- * budget par catégorie et opérations du mois.
+ * Effet d'une opération sur le solde d'un compte :
+ * un virement sort du compte de départ et entre sur le compte d'arrivée.
+ */
+export function balanceEffect(t: Movement, accountId: number) {
+  const amount = Number(t.amount)
+  if (t.type === 'transfer') {
+    if (t.toAccountId === accountId) return amount
+    return t.accountId === accountId ? -amount : 0
+  }
+  if (t.accountId !== accountId) return 0
+  return t.type === 'income' ? amount : -amount
+}
+
+/**
+ * Épargne versée par une opération : virement vers un compte épargne (+),
+ * ou retiré d'un compte épargne vers un autre compte (−).
+ */
+export function savingsEffect(t: Movement, savingsIds: Set<number>) {
+  if (t.type !== 'transfer') return 0
+  const toSavings = savingsIds.has(t.toAccountId!)
+  const fromSavings = savingsIds.has(t.accountId)
+  if (toSavings === fromSavings) return 0
+  return toSavings ? Number(t.amount) : -Number(t.amount)
+}
+
+// Identifiants des comptes de type « épargne »
+async function savingsAccountIds(user: User) {
+  const accounts = await user.related('accounts').query().where('type', 'epargne')
+  return new Set(accounts.map((a) => a.id))
+}
+
+/**
+ * Solde de chaque compte : solde initial + revenus − dépenses ± virements.
+ */
+export async function accountBalances(user: User) {
+  const accounts = await user.related('accounts').query().orderBy('name')
+  const transactions = await user.related('transactions').query()
+  return accounts.map((a) => ({
+    account: a,
+    balance: round(
+      transactions.reduce((sum, t) => sum + balanceEffect(t, a.id), Number(a.initialBalance))
+    ),
+  }))
+}
+
+/**
+ * Chiffres clés d'un mois : revenus, dépenses, épargne versée, reste,
+ * taux de dépenses, budget par catégorie et opérations du mois.
  */
 export async function monthSummary(user: User, month: DateTime) {
   const start = month.startOf('month').toISODate()!
   const end = month.endOf('month').toISODate()!
+  const savingsIds = await savingsAccountIds(user)
 
   const transactions = await user
     .related('transactions')
     .query()
     .preload('category')
+    .preload('account')
+    .preload('toAccount')
     .whereBetween('date', [start, end])
     .orderBy('date', 'desc')
     .orderBy('id', 'desc')
@@ -30,6 +81,7 @@ export async function monthSummary(user: User, month: DateTime) {
   const expenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount), 0)
+  const savings = transactions.reduce((sum, t) => sum + savingsEffect(t, savingsIds), 0)
 
   // Taux de dépenses : pas calculé si aucun revenu
   const spendingRate = income > 0 ? Math.round((expenses / income) * 1000) / 10 : null
@@ -64,19 +116,24 @@ export async function monthSummary(user: User, month: DateTime) {
     salary: round(salary),
     otherIncome: round(income - salary),
     expenses: round(expenses),
-    savings: round(income - expenses),
+    savings: round(savings),
+    // Ce qui reste une fois les dépenses payées et l'épargne mise de côté
+    rest: round(income - expenses - savings),
     spendingRate,
     budgets,
     uncategorized: round(uncategorized),
     transactions: transactions.map((t) => ({
       id: t.id,
-      type: t.type as 'income' | 'expense',
+      type: t.type as 'income' | 'expense' | 'transfer',
       amount: Number(t.amount),
       date: t.date.toISODate() ?? '',
       description: t.description,
       note: t.note,
       accountId: t.accountId,
+      toAccountId: t.toAccountId,
       categoryId: t.categoryId,
+      accountName: t.account.name,
+      toAccountName: t.toAccount?.name ?? null,
       categoryName: t.category?.name ?? null,
       categoryColor: t.category?.color ?? null,
     })),
@@ -85,12 +142,13 @@ export async function monthSummary(user: User, month: DateTime) {
 
 /**
  * Historique mois par mois, du plus ancien au plus récent (mois en cours inclus) :
- * revenus, dépenses, épargne et solde total en fin de mois.
+ * revenus, dépenses, épargne versée et solde total en fin de mois.
  * `count` : nombre de mois, ou 'all' pour remonter à la première opération.
  */
 export async function monthlyHistory(user: User, count: number | 'all') {
   const now = DateTime.now().startOf('month')
   const accounts = await user.related('accounts').query()
+  const savingsIds = new Set(accounts.filter((a) => a.type === 'epargne').map((a) => a.id))
   const transactions = await user.related('transactions').query().orderBy('date', 'asc')
 
   const oldest = transactions[0]?.date.startOf('month') ?? now
@@ -98,10 +156,12 @@ export async function monthlyHistory(user: User, count: number | 'all') {
   const length = Math.floor(now.diff(first, 'months').months) + 1
 
   // Solde au début de la période : soldes initiaux + opérations antérieures
+  // (un virement entre deux comptes ne change pas le solde total)
   let balance = accounts.reduce((sum, a) => sum + Number(a.initialBalance), 0)
   for (const t of transactions) {
     if (t.date.toMillis() >= first.toMillis()) break
-    balance += t.type === 'income' ? Number(t.amount) : -Number(t.amount)
+    if (t.type === 'income') balance += Number(t.amount)
+    if (t.type === 'expense') balance -= Number(t.amount)
   }
 
   return Array.from({ length }, (_, i) => {
@@ -112,12 +172,13 @@ export async function monthlyHistory(user: User, count: number | 'all') {
       ofMonth.filter((t) => t.type === type).reduce((s, t) => s + Number(t.amount), 0)
     const income = sum('income')
     const expenses = sum('expense')
+    const savings = ofMonth.reduce((s, t) => s + savingsEffect(t, savingsIds), 0)
     balance += income - expenses
     return {
       month: key,
       income: round(income),
       expenses: round(expenses),
-      savings: round(income - expenses),
+      savings: round(savings),
       balance: round(balance),
     }
   })
@@ -144,21 +205,20 @@ export async function dailyExpenses(user: User, month: DateTime) {
 }
 
 /**
- * Objectif d'épargne et progression : épargne (revenus - dépenses)
- * cumulée depuis la date de départ de l'objectif.
+ * Objectif d'épargne et progression : virements nets vers les comptes épargne
+ * depuis la date de départ de l'objectif.
  */
 export async function savingsGoalProgress(user: User) {
   const goal = await SavingsGoal.findBy('userId', user.id)
   if (!goal) return null
 
+  const savingsIds = await savingsAccountIds(user)
   const transactions = await user
     .related('transactions')
     .query()
+    .where('type', 'transfer')
     .where('date', '>=', goal.startDate.toISODate()!)
-  const saved = transactions.reduce(
-    (s, t) => s + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)),
-    0
-  )
+  const saved = transactions.reduce((s, t) => s + savingsEffect(t, savingsIds), 0)
   const target = Number(goal.targetAmount)
   const remaining = Math.max(target - saved, 0)
 

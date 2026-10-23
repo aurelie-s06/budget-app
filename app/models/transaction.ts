@@ -12,6 +12,10 @@ export default class Transaction extends TransactionSchema {
   @belongsTo(() => Account)
   declare account: BelongsTo<typeof Account>
 
+  // Compte d'arrivée d'un virement
+  @belongsTo(() => Account, { foreignKey: 'toAccountId' })
+  declare toAccount: BelongsTo<typeof Account>
+
   @belongsTo(() => Category)
   declare category: BelongsTo<typeof Category>
 }

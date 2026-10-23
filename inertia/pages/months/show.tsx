@@ -9,6 +9,8 @@ import BudgetList, { type Budget } from '~/components/budget_list'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
 
 type Transaction = EditableTransaction & {
+  accountName: string
+  toAccountName: string | null
   categoryName: string | null
   categoryColor: string | null
 }
@@ -22,15 +24,22 @@ type Props = {
   otherIncome: number
   expenses: number
   savings: number
+  rest: number
   spendingRate: number | null
   budgets: Budget[]
   uncategorized: number
   transactions: Transaction[]
-  accounts: Option[]
+  accounts: (Option & { type: string })[]
   categories: Option[]
 }
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+// Signe et couleur du montant selon le type d'opération
+const AMOUNT = {
+  income: { sign: '+', className: 'b-amount--in' },
+  expense: { sign: '−', className: 'b-amount--out' },
+  transfer: { sign: '⇄', className: 'b-amount--move' },
+}
 
 export default function MonthShow(props: Props) {
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -123,15 +132,23 @@ export default function MonthShow(props: Props) {
                 </>
               }
             />
-            <Stat label="Dépenses" value={euros(props.expenses)} tone="out" />
+            <Stat
+              label="Dépenses"
+              value={euros(props.expenses)}
+              tone="out"
+              hint={props.spendingRate !== null ? `${props.spendingRate} % des revenus` : undefined}
+            />
             <Stat
               label="Épargne"
               value={euros(props.savings)}
               tone={props.savings < 0 ? 'out' : undefined}
+              hint="Virée sur tes comptes épargne"
             />
             <Stat
-              label="Taux de dépenses"
-              value={props.spendingRate !== null ? `${props.spendingRate} %` : '—'}
+              label="Reste"
+              value={euros(props.rest)}
+              tone={props.rest < 0 ? 'out' : undefined}
+              hint="Revenus − dépenses − épargne"
             />
           </section>
 
@@ -202,11 +219,13 @@ export default function MonthShow(props: Props) {
                             day: 'numeric',
                             month: 'long',
                           })}
-                          {t.categoryName && ` · ${t.categoryName}`}
+                          {t.type === 'transfer'
+                            ? ` · ${t.accountName} → ${t.toAccountName}`
+                            : t.categoryName && ` · ${t.categoryName}`}
                         </div>
                       </div>
-                      <span className={`b-amount b-amount--${t.type === 'income' ? 'in' : 'out'}`}>
-                        {t.type === 'income' ? '+' : '−'} {euros(t.amount)}
+                      <span className={`b-amount ${AMOUNT[t.type].className}`}>
+                        {AMOUNT[t.type].sign} {euros(t.amount)}
                       </span>
                       <div className="b-actions">
                         <button className="b-link" onClick={() => startEdit(t.id)}>

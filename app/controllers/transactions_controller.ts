@@ -4,11 +4,26 @@ import type User from '#models/user'
 import { transactionValidator, transactionFiltersValidator } from '#validators/transaction'
 
 // Vérifie que le compte et la catégorie appartiennent à l'utilisateur (sinon : 404)
-async function checkOwnership(user: User, accountId: number, categoryId?: number | null) {
+async function checkOwnership(
+  user: User,
+  accountId: number,
+  categoryId?: number | null,
+  toAccountId?: number | null
+) {
   await user.related('accounts').query().where('id', accountId).firstOrFail()
+  if (toAccountId) {
+    await user.related('accounts').query().where('id', toAccountId).firstOrFail()
+  }
   if (categoryId) {
     await user.related('categories').query().where('id', categoryId).firstOrFail()
   }
+}
+
+// Un virement n'a pas de catégorie ; une dépense ou un revenu n'a pas de compte d'arrivée
+function cleanup<
+  T extends { type: string; toAccountId?: number | null; categoryId?: number | null },
+>(data: T) {
+  return data.type === 'transfer' ? { ...data, categoryId: null } : { ...data, toAccountId: null }
 }
 
 export default class TransactionsController {
@@ -20,6 +35,7 @@ export default class TransactionsController {
       .related('transactions')
       .query()
       .preload('account')
+      .preload('toAccount')
       .preload('category')
       .orderBy('date', 'desc')
       .orderBy('id', 'desc')
@@ -32,7 +48,12 @@ export default class TransactionsController {
         month.endOf('month').toISODate()!,
       ])
     }
-    if (filters.accountId) query.where('account_id', filters.accountId)
+    // Un compte voit aussi les virements qu'il reçoit
+    if (filters.accountId) {
+      query.where((q) =>
+        q.where('account_id', filters.accountId!).orWhere('to_account_id', filters.accountId!)
+      )
+    }
     if (filters.categoryId) query.where('category_id', filters.categoryId)
     if (filters.type) query.where('type', filters.type)
     if (filters.search) query.where('description', 'like', `%${filters.search}%`)
@@ -48,18 +69,20 @@ export default class TransactionsController {
     return inertia.render('transactions/index', {
       transactions: transactions.map((t) => ({
         id: t.id,
-        type: t.type as 'income' | 'expense',
+        type: t.type as 'income' | 'expense' | 'transfer',
         amount: Number(t.amount),
         date: t.date.toISODate() ?? '',
         description: t.description,
         note: t.note,
         accountId: t.accountId,
+        toAccountId: t.toAccountId,
         categoryId: t.categoryId,
         accountName: t.account.name,
+        toAccountName: t.toAccount?.name ?? null,
         categoryName: t.category?.name ?? null,
         categoryColor: t.category?.color ?? null,
       })),
-      accounts: accounts.map((a) => ({ id: a.id, name: a.name })),
+      accounts: accounts.map((a) => ({ id: a.id, name: a.name, type: a.type })),
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       months,
       filters: {
@@ -74,8 +97,8 @@ export default class TransactionsController {
 
   async store({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
-    const data = await request.validateUsing(transactionValidator)
-    await checkOwnership(user, data.accountId, data.categoryId)
+    const data = cleanup(await request.validateUsing(transactionValidator))
+    await checkOwnership(user, data.accountId, data.categoryId, data.toAccountId)
 
     await user.related('transactions').create({
       ...data,
@@ -91,8 +114,8 @@ export default class TransactionsController {
       .query()
       .where('id', params.id)
       .firstOrFail()
-    const data = await request.validateUsing(transactionValidator)
-    await checkOwnership(user, data.accountId, data.categoryId)
+    const data = cleanup(await request.validateUsing(transactionValidator))
+    await checkOwnership(user, data.accountId, data.categoryId, data.toAccountId)
 
     transaction.merge({ ...data, date: DateTime.fromISO(data.date) })
     await transaction.save()

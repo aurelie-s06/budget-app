@@ -1,11 +1,4 @@
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-} from 'chart.js'
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 import { router } from '@inertiajs/react'
 import useThemeColors from '~/components/use_theme_colors'
@@ -33,7 +26,12 @@ export default function MonthlyChart({ months }: { months: Month[] }) {
           data={{
             labels: months.map((m) => label(m.month)),
             datasets: [
-              { label: 'Revenus', data: months.map((m) => m.income), backgroundColor: colors.in, ...bar },
+              {
+                label: 'Revenus',
+                data: months.map((m) => m.income),
+                backgroundColor: colors.in,
+                ...bar,
+              },
               {
                 label: 'Dépenses',
                 data: months.map((m) => m.expenses),
@@ -54,7 +52,11 @@ export default function MonthlyChart({ months }: { months: Month[] }) {
               if (target) target.style.cursor = elements.length ? 'pointer' : 'default'
             },
             scales: {
-              x: { grid: { display: false }, ticks: { color: colors.muted }, border: { color: colors.line } },
+              x: {
+                grid: { display: false },
+                ticks: { color: colors.muted },
+                border: { color: colors.line },
+              },
               y: {
                 beginAtZero: true,
                 grid: { color: colors.line },
@@ -77,7 +79,7 @@ export default function MonthlyChart({ months }: { months: Month[] }) {
                   label: (ctx) => `${ctx.dataset.label} : ${euros(ctx.parsed.y ?? 0)}`,
                   footer: (items) => {
                     const m = months[items[0].dataIndex]
-                    return `Solde : ${euros(m.income - m.expenses)}`
+                    return `Revenus − dépenses : ${euros(m.income - m.expenses)}`
                   },
                 },
               },

@@ -21,7 +21,7 @@ export default class MonthsController {
       month: month.toFormat('yyyy-MM'),
       previous: month.minus({ months: 1 }).toFormat('yyyy-MM'),
       next: month.plus({ months: 1 }).toFormat('yyyy-MM'),
-      accounts: accounts.map((a) => ({ id: a.id, name: a.name })),
+      accounts: accounts.map((a) => ({ id: a.id, name: a.name, type: a.type })),
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       ...summary,
     })

@@ -1047,6 +1047,19 @@ select.field__input {
   font-weight: 500;
   color: var(--muted);
 }
+.b-toggle--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.b-toggle button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.b-form__hint {
+  margin-top: -8px;
+  font-size: 12.5px;
+  color: var(--muted);
+  text-wrap: pretty;
+}
 .b-toggle button[aria-pressed='true'] {
   background: var(--card);
   color: var(--ink);
@@ -1127,6 +1140,10 @@ select.field__input {
 }
 .b-amount--out {
   color: var(--out);
+}
+/* Virement entre deux comptes : ni revenu ni dépense */
+.b-amount--move {
+  color: var(--ink-2);
 }
 
 /* Petits boutons texte */
@@ -1817,4 +1834,7 @@ select.field__input {
   font-size: 14px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+}
+.b-form--inline > .b-form__hint {
+  grid-column: 1 / -1;
 }
