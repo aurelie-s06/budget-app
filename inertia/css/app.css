@@ -1176,18 +1176,10 @@ select.field__input {
   margin-top: 2px;
   font-size: 12px;
   color: var(--muted);
-}
-/* Vue mensuelle : 2 lignes de 3 (revenus, puis dépenses / épargne / taux) */
-.b-stats--3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.b-stats--3 + .b-stats--3 {
-  margin-top: -12px;
-}
-@media (max-width: 720px) {
-  .b-stats--3 {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Barres de budget */

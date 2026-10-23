@@ -111,17 +111,18 @@ export default function MonthShow(props: Props) {
             </div>
           </header>
 
-          <section className="b-stats b-stats--3">
-            <Stat label="Salaire" value={euros(props.salary)} tone="in" />
-            <Stat label="Autres revenus" value={euros(props.otherIncome)} tone="in" />
+          <section className="b-stats">
             <Stat
-              label="Revenus totaux"
+              label="Revenus"
               value={euros(props.income)}
               tone="in"
-              hint="Salaire + autres revenus"
+              hint={
+                <>
+                  <span>Salaire {euros(props.salary)}</span>
+                  <span>Autres {euros(props.otherIncome)}</span>
+                </>
+              }
             />
-          </section>
-          <section className="b-stats b-stats--3">
             <Stat label="Dépenses" value={euros(props.expenses)} tone="out" />
             <Stat
               label="Épargne"

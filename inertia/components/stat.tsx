@@ -7,7 +7,7 @@ export default function Stat({
   label: string
   value: string
   tone?: 'in' | 'out'
-  hint?: string
+  hint?: React.ReactNode
 }) {
   return (
     <div className="b-stat">
