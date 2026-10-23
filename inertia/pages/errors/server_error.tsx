@@ -1,25 +1,28 @@
-import MarketingLayout from '~/layouts/marketing'
+import Footer from '~/components/footer'
 
 export default function ServerError() {
   return (
-    <div className="home">
-      <article className="prose-card">
-        <div className="pc-top">
-          <span className="pc-status mono tag" style={{ color: '#c0392b' }}>
-            <span className="dot" /> 500
-          </span>
-        </div>
-        <div className="pc-lead">
-          <span>Something broke.</span>
-          <em>The server hit an unexpected error.</em>
-        </div>
-        <p className="pc-para">
-          Try again in a moment. If the problem persists, check the server logs for the underlying
-          exception.
-        </p>
-      </article>
+    <div className="b-landing">
+      <main className="home">
+        <article className="prose-card">
+          <div className="pc-top">
+            <span className="pc-status mono tag" style={{ color: 'var(--out)' }}>
+              <span className="dot" /> 500
+            </span>
+          </div>
+          <div className="pc-lead">
+            <span>Une erreur est survenue.</span>
+            <em>Le serveur n&apos;a pas pu traiter la demande.</em>
+          </div>
+          <p className="pc-para">
+            Réessaie dans un instant. Si le problème persiste, consulte les logs du serveur.
+          </p>
+          <a href="/" className="btn btn--primary pc-action">
+            Retour à l&apos;accueil
+          </a>
+        </article>
+      </main>
+      <Footer />
     </div>
   )
 }
-
-ServerError.layout = [MarketingLayout]

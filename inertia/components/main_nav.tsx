@@ -1,4 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react'
+import ThemeToggle from '~/components/theme_toggle'
 
 const links = [
   { href: '/dashboard', label: 'Tableau de bord' },
@@ -13,9 +14,12 @@ export default function MainNav() {
   return (
     <>
       <header className="header--bar">
-        <div className="header__inner">
-          <span className="b-brand">Mon Budget</span>
+        <div className="header__inner b-container">
+          <Link href="/dashboard" className="b-brand b-brand--lg">
+            Mon Budget
+          </Link>
           <div className="header__right">
+            <ThemeToggle />
             <button className="btn btn--secondary btn--sm" onClick={() => router.post('/logout')}>
               Déconnexion
             </button>
@@ -23,7 +27,7 @@ export default function MainNav() {
         </div>
       </header>
       <nav className="subnav">
-        <div className="subnav__inner">
+        <div className="subnav__inner b-container">
           {links.map((l) => (
             <Link
               key={l.href}

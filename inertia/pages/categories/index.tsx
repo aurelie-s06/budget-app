@@ -1,5 +1,6 @@
 import { useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
+import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 
 type Category = {
@@ -156,6 +157,7 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
           </div>
         </div>
       </main>
+      <Footer />
     </>
   )
 }

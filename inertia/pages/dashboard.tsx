@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react'
+import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import ExpensesChart from '~/components/expenses_chart'
 
@@ -158,6 +159,7 @@ export default function Dashboard(props: Props) {
           </section>
         </div>
       </main>
+      <Footer />
     </>
   )
 }

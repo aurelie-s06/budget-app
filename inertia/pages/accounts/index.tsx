@@ -1,5 +1,6 @@
 import { useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
+import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 
 type Account = {
@@ -185,6 +186,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   )
 }
