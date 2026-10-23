@@ -1,45 +1,54 @@
 import { Link, router, usePage } from '@inertiajs/react'
+import { ArrowLeftRight, CalendarDays, LayoutDashboard, LogOut, Tags, Wallet } from 'lucide-react'
 import ThemeToggle from '~/components/theme_toggle'
 import Logo from '~/components/logo'
 
 const links = [
-  { href: '/dashboard', label: 'Tableau de bord' },
-  { href: '/months', label: 'Vue mensuelle' },
-  { href: '/transactions', label: 'Opérations' },
-  { href: '/accounts', label: 'Comptes' },
-  { href: '/categories', label: 'Catégories' },
+  { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { href: '/months', label: 'Vue mensuelle', icon: CalendarDays },
+  { href: '/transactions', label: 'Opérations', icon: ArrowLeftRight },
+  { href: '/accounts', label: 'Comptes', icon: Wallet },
+  { href: '/categories', label: 'Catégories', icon: Tags },
 ]
 
+/**
+ * Une seule barre, collée en haut : logo, liens en pastilles, thème et déconnexion.
+ */
 export default function MainNav() {
   const { url } = usePage()
 
   return (
-    <>
-      <header className="header--bar">
-        <div className="header__inner b-container">
-          <Logo href="/dashboard" />
-          <div className="header__right">
-            <ThemeToggle />
-            <button className="btn btn--secondary btn--sm" onClick={() => router.post('/logout')}>
-              Déconnexion
-            </button>
-          </div>
-        </div>
-      </header>
-      <nav className="subnav">
-        <div className="subnav__inner b-container">
-          {links.map((l) => (
+    <header className="b-topbar">
+      <div className="b-topbar__inner b-container">
+        <Logo href="/dashboard" />
+
+        <nav className="b-topnav" aria-label="Navigation principale">
+          {links.map(({ href, label, icon: Icon }) => (
             <Link
-              key={l.href}
-              href={l.href}
-              className="subnav__item"
-              aria-current={url.startsWith(l.href) ? 'page' : undefined}
+              key={href}
+              href={href}
+              className="b-topnav__item"
+              aria-current={url.startsWith(href) ? 'page' : undefined}
             >
-              {l.label}
+              <Icon size={16} aria-hidden="true" />
+              {label}
             </Link>
           ))}
+        </nav>
+
+        <div className="b-topbar__actions">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="iconbtn"
+            onClick={() => router.post('/logout')}
+            aria-label="Déconnexion"
+            title="Déconnexion"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
-      </nav>
-    </>
+      </div>
+    </header>
   )
 }

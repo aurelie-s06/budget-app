@@ -972,14 +972,6 @@ input {
   max-width: 1080px;
   margin: 0 auto;
 }
-.subnav__inner.b-container {
-  width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.subnav__item {
-  white-space: nowrap;
-}
 
 /* Cartes et listes : un peu plus de relief */
 .b-stat {
@@ -1932,4 +1924,96 @@ a.b-cal__day:hover {
   align-self: flex-start;
   margin: auto 0 -4px -8px;
   padding-top: 10px;
+}
+
+/* ==========================================================================
+   Barre de navigation : une seule barre, collée en haut
+   ========================================================================== */
+.b-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line-2);
+}
+.b-topbar__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 0 30px;
+}
+.b-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.b-topnav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 auto;
+  padding: 4px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 99px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.b-topnav::-webkit-scrollbar {
+  display: none;
+}
+.b-topnav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.b-topnav__item:hover {
+  color: var(--ink);
+  background: var(--card);
+}
+.b-topnav__item[aria-current='page'] {
+  background: var(--btn);
+  color: var(--btn-fg);
+}
+.b-topnav__item:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Écran moyen : les pastilles passent sous le logo, sur toute la largeur */
+@media (max-width: 1000px) {
+  .b-topbar__inner {
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .b-topnav {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0;
+  }
+  .b-topnav__item {
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+}
+@media (max-width: 720px) {
+  .b-topbar__inner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
