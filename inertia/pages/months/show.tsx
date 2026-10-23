@@ -5,6 +5,7 @@ import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import Stat from '~/components/stat'
 import ExpensesChart from '~/components/expenses_chart'
+import SpendingCalendar from '~/components/spending_calendar'
 import BudgetList, { type Budget } from '~/components/budget_list'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
 
@@ -29,6 +30,7 @@ type Props = {
   budgets: Budget[]
   uncategorized: number
   transactions: Transaction[]
+  days: { date: string; amount: number }[]
   accounts: (Option & { type: string })[]
   categories: Option[]
 }
@@ -152,10 +154,15 @@ export default function MonthShow(props: Props) {
             />
           </section>
 
-          <div className="b-grid-2">
+          <div className="b-grid-3">
             <section className="panel">
               <h2 className="section__title b-section-title">Répartition des dépenses</h2>
               <ExpensesChart items={breakdown} />
+            </section>
+
+            <section className="panel">
+              <h2 className="section__title b-section-title">Calendrier des dépenses</h2>
+              <SpendingCalendar days={props.days} />
             </section>
 
             <section className="panel">

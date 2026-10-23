@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
-import { monthSummary } from '#services/budget_service'
+import { dailyExpenses, monthSummary } from '#services/budget_service'
 import { monthValidator } from '#validators/month'
 
 export default class MonthsController {
@@ -24,6 +24,7 @@ export default class MonthsController {
       accounts: accounts.map((a) => ({ id: a.id, name: a.name, type: a.type })),
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       ...summary,
+      days: await dailyExpenses(user, month),
     })
   }
 }

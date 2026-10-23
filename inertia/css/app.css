@@ -1005,6 +1005,14 @@ input {
   gap: 24px;
   margin-bottom: 24px;
 }
+/* Vue mensuelle : répartition, calendrier et budgets côte à côte */
+.b-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+  align-items: start;
+}
 @media (max-width: 880px) {
   .b-split,
   .b-grid-2 {
@@ -1562,6 +1570,9 @@ select.field__input {
 .b-span-8 {
   grid-column: span 8;
 }
+.b-span-12 {
+  grid-column: span 12;
+}
 @media (max-width: 1000px) {
   .b-span-4 {
     grid-column: span 6;
@@ -1837,4 +1848,42 @@ select.field__input {
 }
 .b-form--inline > .b-form__hint {
   grid-column: 1 / -1;
+}
+
+/* Solde de chaque compte */
+.b-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+.b-accounts li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+.b-accounts li > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+}
+.b-badge {
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  font-size: 11px;
+  color: var(--muted);
+}
+.b-accounts__link {
+  align-self: flex-start;
+  margin: auto 0 -4px -8px;
+  padding-top: 10px;
 }

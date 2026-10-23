@@ -2,7 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import {
   accountBalances,
-  dailyExpenses,
   monthSummary,
   monthlyHistory,
   savingsGoalProgress,
@@ -28,16 +27,18 @@ export default class DashboardController {
     return inertia.render('dashboard', {
       period,
       totalBalance: round(totalBalance),
-      accountCount: balances.length,
+      accounts: balances.map(({ account: a, balance }) => ({
+        id: a.id,
+        name: a.name,
+        type: a.type,
+        balance,
+      })),
       income: summary.income,
       expenses: summary.expenses,
       savings: summary.savings,
       rest: summary.rest,
       spendingRate: summary.spendingRate,
-      budgets: summary.budgets,
-      uncategorized: summary.uncategorized,
       history: await monthlyHistory(user, period === 'all' ? 'all' : Number(period)),
-      days: await dailyExpenses(user, now),
       goal: await savingsGoalProgress(user),
     })
   }

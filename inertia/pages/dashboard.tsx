@@ -4,25 +4,19 @@ import MainNav from '~/components/main_nav'
 import MonthlyChart from '~/components/monthly_chart'
 import BalanceChart from '~/components/balance_chart'
 import SavingsChart from '~/components/savings_chart'
-import SpendingCalendar from '~/components/spending_calendar'
-import ExpensesChart from '~/components/expenses_chart'
-import BudgetList, { type Budget } from '~/components/budget_list'
 import SavingsGoal, { type Goal } from '~/components/savings_goal'
 
 type Period = '6' | '12' | 'all'
 type Props = {
   period: Period
   totalBalance: number
-  accountCount: number
+  accounts: { id: number; name: string; type: string; balance: number }[]
   income: number
   expenses: number
   savings: number
   rest: number
   spendingRate: number | null
-  budgets: Budget[]
-  uncategorized: number
   history: { month: string; income: number; expenses: number; savings: number; balance: number }[]
-  days: { date: string; amount: number }[]
   goal: Goal | null
 }
 
@@ -48,12 +42,6 @@ export default function Dashboard(props: Props) {
     })
   }
 
-  const breakdown = [
-    ...props.budgets.filter((b) => b.spent > 0),
-    ...(props.uncategorized > 0
-      ? [{ name: 'Sans catégorie', color: null, spent: props.uncategorized }]
-      : []),
-  ]
   const rate = props.spendingRate
 
   return (
@@ -89,12 +77,20 @@ export default function Dashboard(props: Props) {
               <div className={`b-tile__value ${props.totalBalance < 0 ? 'b-amount--out' : ''}`}>
                 {euros(props.totalBalance)}
               </div>
-              <p className="b-tile__hint">
-                Sur {props.accountCount} compte{props.accountCount > 1 ? 's' : ''} ·{' '}
-                <Link href="/accounts" className="b-link">
-                  Voir les comptes
-                </Link>
-              </p>
+              <ul className="b-accounts">
+                {props.accounts.map((a) => (
+                  <li key={a.id}>
+                    <span>
+                      {a.name}
+                      {a.type === 'epargne' && <span className="b-badge">Épargne</span>}
+                    </span>
+                    <span className={a.balance < 0 ? 'b-amount--out' : ''}>{euros(a.balance)}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/accounts" className="b-link b-accounts__link">
+                Gérer les comptes
+              </Link>
             </section>
 
             {/* Mois en cours */}
@@ -148,7 +144,7 @@ export default function Dashboard(props: Props) {
             </section>
 
             {/* Revenus / dépenses */}
-            <section className="b-tile b-span-8">
+            <section className="b-tile b-span-12">
               <header className="b-tile__head">
                 <div>
                   <h2 className="section__title">Revenus et dépenses</h2>
@@ -159,17 +155,6 @@ export default function Dashboard(props: Props) {
                 </div>
               </header>
               <MonthlyChart months={props.history} />
-            </section>
-
-            {/* Budgets */}
-            <section className="b-tile b-span-4">
-              <header className="b-tile__head">
-                <h2 className="section__title">Budgets du mois</h2>
-                <Link href="/categories" className="b-link">
-                  Gérer
-                </Link>
-              </header>
-              <BudgetList budgets={props.budgets.filter((b) => b.budget !== null)} />
             </section>
 
             {/* Solde dans le temps */}
@@ -194,25 +179,6 @@ export default function Dashboard(props: Props) {
                 </div>
               </header>
               <SavingsChart months={props.history} />
-            </section>
-
-            {/* Calendrier */}
-            <section className="b-tile b-span-6">
-              <header className="b-tile__head">
-                <div>
-                  <h2 className="section__title">Calendrier des dépenses</h2>
-                  <p className="section__description b-capitalize">{month}</p>
-                </div>
-              </header>
-              <SpendingCalendar days={props.days} />
-            </section>
-
-            {/* Répartition */}
-            <section className="b-tile b-span-6">
-              <header className="b-tile__head">
-                <h2 className="section__title">Répartition des dépenses</h2>
-              </header>
-              <ExpensesChart items={breakdown} />
             </section>
           </div>
         </div>
