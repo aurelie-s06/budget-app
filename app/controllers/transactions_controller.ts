@@ -48,6 +48,7 @@ export default class TransactionsController {
         month.endOf('month').toISODate()!,
       ])
     }
+    if (filters.day) query.where('date', filters.day)
     // Un compte voit aussi les virements qu'il reçoit
     if (filters.accountId) {
       query.where((q) =>
@@ -87,6 +88,7 @@ export default class TransactionsController {
       months,
       filters: {
         month: filters.month ?? '',
+        day: filters.day ?? '',
         accountId: filters.accountId?.toString() ?? '',
         categoryId: filters.categoryId?.toString() ?? '',
         type: filters.type ?? '',

@@ -1,3 +1,5 @@
+import { Link } from '@inertiajs/react'
+
 type Day = { date: string; amount: number }
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
@@ -11,6 +13,7 @@ function level(amount: number, max: number) {
 
 /**
  * Un carré par jour du mois, plus foncé quand on a dépensé davantage.
+ * Survol : montant dépensé ce jour-là ; clic : opérations du jour.
  */
 export default function SpendingCalendar({ days }: { days: Day[] }) {
   const today = new Date().toISOString().slice(0, 10)
@@ -37,26 +40,42 @@ export default function SpendingCalendar({ days }: { days: Day[] }) {
         ))}
         {days.map((d) => {
           const future = d.date > today
-          const text = `${dayLabel(d.date, { weekday: 'long', day: 'numeric', month: 'long' })} : ${
-            future ? 'à venir' : euros(d.amount)
-          }`
-          return (
-            <span
+          const label = dayLabel(d.date, { weekday: 'long', day: 'numeric', month: 'long' })
+          const amount = future ? 'à venir' : d.amount > 0 ? euros(d.amount) : 'aucune dépense'
+          const className = [
+            'b-cal__day',
+            `b-cal__day--l${level(d.amount, max)}`,
+            future && 'b-cal__day--future',
+            d.date === today && 'b-cal__day--today',
+          ]
+            .filter(Boolean)
+            .join(' ')
+          // Bulle affichée au survol (ou au focus clavier)
+          const content = (
+            <>
+              {Number(d.date.slice(8))}
+              <span className="b-cal__tip" role="tooltip">
+                <span className="b-capitalize">{label}</span>
+                <strong>{amount}</strong>
+              </span>
+            </>
+          )
+
+          // Un jour passé ouvre ses opérations
+          return future ? (
+            <span key={d.date} role="listitem" className={className} tabIndex={0}>
+              {content}
+            </span>
+          ) : (
+            <Link
               key={d.date}
               role="listitem"
-              className={[
-                'b-cal__day',
-                `b-cal__day--l${level(d.amount, max)}`,
-                future && 'b-cal__day--future',
-                d.date === today && 'b-cal__day--today',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              title={text}
-              aria-label={text}
+              href={`/transactions?day=${d.date}`}
+              className={className}
+              aria-label={`${label} : ${amount}. Voir les opérations du jour`}
             >
-              {Number(d.date.slice(8))}
-            </span>
+              {content}
+            </Link>
           )
         })}
       </div>

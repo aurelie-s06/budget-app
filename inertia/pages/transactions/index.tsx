@@ -13,6 +13,7 @@ type Transaction = EditableTransaction & {
 type Option = { id: number; name: string }
 type Filters = {
   month: string
+  day: string
   accountId: string
   categoryId: string
   type: string
@@ -36,7 +37,14 @@ const AMOUNT = {
   expense: { sign: '−', className: 'b-amount--out' },
   transfer: { sign: '⇄', className: 'b-amount--move' },
 }
-const EMPTY_FILTERS: Filters = { month: '', accountId: '', categoryId: '', type: '', search: '' }
+const EMPTY_FILTERS: Filters = {
+  month: '',
+  day: '',
+  accountId: '',
+  categoryId: '',
+  type: '',
+  search: '',
+}
 
 export default function TransactionsIndex({
   transactions,
@@ -100,8 +108,14 @@ export default function TransactionsIndex({
     router.get('/transactions', {}, { preserveState: true, preserveScroll: true, replace: true })
   }
 
+  // Mois et jour s'excluent : choisir l'un vide l'autre
   const setFilter = (key: keyof Filters, value: string) =>
-    setFilterValues((prev) => ({ ...prev, [key]: value }))
+    setFilterValues((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key === 'month' && value !== '' ? { day: '' } : {}),
+      ...(key === 'day' && value !== '' ? { month: '' } : {}),
+    }))
 
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
@@ -139,6 +153,18 @@ export default function TransactionsIndex({
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="f-day">
+                    Jour
+                  </label>
+                  <input
+                    id="f-day"
+                    type="date"
+                    className="field__input"
+                    value={filterValues.day}
+                    onChange={(e) => setFilter('day', e.target.value)}
+                  />
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="f-account">

@@ -32,6 +32,10 @@ export const transactionFiltersValidator = vine.compile(
       .string()
       .regex(/^\d{4}-\d{2}$/)
       .optional(),
+    day: vine
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
     accountId: vine.number().optional(),
     categoryId: vine.number().optional(),
     type: vine.enum(['income', 'expense', 'transfer']).optional(),
