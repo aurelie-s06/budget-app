@@ -48,6 +48,12 @@ const routes = {
     tokens: [[0,"logout"]],
     types: placeholder as Registry['session.destroy']['types'],
   },
+  'months.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/months',
+    tokens: [[0,"months"]],
+    types: placeholder as Registry['months.show']['types'],
+  },
   'categories.index': {
     methods: ["GET","HEAD"],
     pattern: '/categories',

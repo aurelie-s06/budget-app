@@ -98,6 +98,19 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/session_controller').default['destroy']>>>
     }
   }
+  'months.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/months'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/month').monthValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/months_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/months_controller').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/months_controller').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'categories.index': {
     methods: ["GET","HEAD"]
     pattern: '/categories'

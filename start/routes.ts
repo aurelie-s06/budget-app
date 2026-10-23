@@ -27,6 +27,9 @@ router
     router.get('dashboard', [controllers.Dashboard, 'index']).as('dashboard')
     router.post('logout', [controllers.Session, 'destroy'])
 
+    // Vue mensuelle
+    router.get('months', [controllers.Months, 'show']).as('months.show')
+
     // Catégories
     router.get('categories', [controllers.Categories, 'index']).as('categories.index')
     router.post('categories', [controllers.Categories, 'store']).as('categories.store')

@@ -1,17 +1,11 @@
 import { Link } from '@inertiajs/react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import Stat from '~/components/stat'
 import ExpensesChart from '~/components/expenses_chart'
+import MonthlyChart from '~/components/monthly_chart'
+import BudgetList, { type Budget } from '~/components/budget_list'
 
-type Budget = {
-  id: number
-  name: string
-  color: string | null
-  spent: number
-  budget: number | null
-  remaining: number | null
-  percent: number | null
-}
 type Latest = {
   id: number
   type: 'income' | 'expense'
@@ -27,19 +21,11 @@ type Props = {
   savings: number
   spendingRate: number | null
   budgets: Budget[]
+  history: { month: string; income: number; expenses: number }[]
   latest: Latest[]
 }
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-
-function Stat({ label, value, tone }: { label: string; value: string; tone?: 'in' | 'out' }) {
-  return (
-    <div className="b-stat">
-      <div className="b-stat__label">{label}</div>
-      <div className={`b-stat__value ${tone ? `b-amount--${tone}` : ''}`}>{value}</div>
-    </div>
-  )
-}
 
 export default function Dashboard(props: Props) {
   const month = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
@@ -53,6 +39,11 @@ export default function Dashboard(props: Props) {
             <div>
               <h1 className="page__title">Tableau de bord</h1>
               <p className="page__description">Vue d'ensemble de {month}</p>
+            </div>
+            <div className="page__actions">
+              <Link href="/months" className="btn btn--secondary btn--sm">
+                Détail du mois
+              </Link>
             </div>
           </header>
 
@@ -71,6 +62,18 @@ export default function Dashboard(props: Props) {
             />
           </section>
 
+          <section className="panel b-block">
+            <header className="b-panel-head">
+              <div>
+                <h2 className="section__title">Revenus et dépenses</h2>
+                <p className="section__description">
+                  Les 6 derniers mois. Clique sur un mois pour voir son détail.
+                </p>
+              </div>
+            </header>
+            <MonthlyChart months={props.history} />
+          </section>
+
           <div className="b-grid-2">
             <section className="panel">
               <h2 className="section__title b-section-title">Répartition des dépenses</h2>
@@ -79,53 +82,7 @@ export default function Dashboard(props: Props) {
 
             <section className="panel">
               <h2 className="section__title b-section-title">Budgets du mois</h2>
-              {props.budgets.length === 0 ? (
-                <p className="b-empty">
-                  Aucun budget défini.{' '}
-                  <Link href="/categories" className="il">
-                    Ajouter un budget
-                  </Link>
-                </p>
-              ) : (
-                <ul className="b-list">
-                  {props.budgets.map((b) => {
-                    const over = b.remaining !== null && b.remaining < 0
-                    return (
-                      <li key={b.id} className="b-item">
-                        <div className="b-item__main">
-                          <div
-                            style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}
-                          >
-                            <span className="b-item__title">{b.name}</span>
-                            <span className={`b-amount ${over ? 'b-amount--out' : ''}`}>
-                              {euros(b.spent)}
-                              {b.budget !== null && (
-                                <span className="b-item__meta"> / {euros(b.budget)}</span>
-                              )}
-                            </span>
-                          </div>
-                          {b.budget !== null && (
-                            <div className="b-bar">
-                              <div
-                                className="b-bar__fill"
-                                style={{
-                                  width: `${Math.min(b.percent ?? 0, 100)}%`,
-                                  background: over ? 'var(--out)' : (b.color ?? 'var(--ink)'),
-                                }}
-                              />
-                            </div>
-                          )}
-                          {over && (
-                            <div className="b-item__meta b-amount--out">
-                              Dépassé de {euros(-b.remaining!)}
-                            </div>
-                          )}
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
+              <BudgetList budgets={props.budgets} />
             </section>
           </div>
 

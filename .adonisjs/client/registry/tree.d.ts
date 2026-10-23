@@ -13,6 +13,9 @@ export interface ApiDefinition {
     destroy: typeof routes['session.destroy']
   }
   dashboard: typeof routes['dashboard']
+  months: {
+    show: typeof routes['months.show']
+  }
   categories: {
     index: typeof routes['categories.index']
     store: typeof routes['categories.store']

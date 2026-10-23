@@ -3,6 +3,7 @@ import ThemeToggle from '~/components/theme_toggle'
 
 const links = [
   { href: '/dashboard', label: 'Tableau de bord' },
+  { href: '/months', label: 'Vue mensuelle' },
   { href: '/transactions', label: 'Opérations' },
   { href: '/accounts', label: 'Comptes' },
   { href: '/categories', label: 'Catégories' },

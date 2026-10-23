@@ -1213,8 +1213,60 @@ select.field__input {
   margin-bottom: 16px;
 }
 .b-chart {
-  max-width: 260px;
+  max-width: 300px;
   margin: 0 auto;
+}
+.b-chart__total {
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.b-chart__total strong {
+  margin-left: 4px;
+  font-size: 15px;
+  color: var(--ink);
+}
+.b-chart-bar {
+  position: relative;
+  height: 280px;
+}
+.b-block {
+  margin-bottom: 24px;
+}
+.b-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.b-item__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.b-item__head .b-item__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.b-month-nav {
+  align-items: center;
+}
+.b-capitalize::first-letter {
+  text-transform: uppercase;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .b-empty {
   font-size: 14px;
