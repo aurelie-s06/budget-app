@@ -40,5 +40,8 @@ export const transactionFiltersValidator = vine.compile(
     categoryId: vine.number().optional(),
     type: vine.enum(['income', 'expense', 'transfer']).optional(),
     search: vine.string().trim().maxLength(100).optional(),
+    minAmount: vine.number().min(0).optional(),
+    maxAmount: vine.number().min(0).optional(),
+    sort: vine.enum(['date_desc', 'date_asc', 'amount_desc', 'amount_asc']).optional(),
   })
 )

@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
 
 type Transaction = EditableTransaction & {
@@ -18,6 +19,9 @@ type Filters = {
   categoryId: string
   type: string
   search: string
+  minAmount: string
+  maxAmount: string
+  sort: string
 }
 type Props = {
   transactions: Transaction[]
@@ -44,6 +48,9 @@ const EMPTY_FILTERS: Filters = {
   categoryId: '',
   type: '',
   search: '',
+  minAmount: '',
+  maxAmount: '',
+  sort: '',
 }
 
 export default function TransactionsIndex({
@@ -75,7 +82,7 @@ export default function TransactionsIndex({
             {header}
             <section className="panel">
               <p className="b-empty">
-                Crée d'abord un compte pour ajouter des opérations :{' '}
+                Crée d’abord un compte pour ajouter des opérations :{' '}
                 <a href="/accounts" className="il">
                   gérer mes comptes
                 </a>
@@ -93,9 +100,9 @@ export default function TransactionsIndex({
     if (confirm(`Supprimer « ${t.description} » ?`)) router.delete(`/transactions/${t.id}`)
   }
 
-  function applyFilters(e?: React.FormEvent) {
+  function applyFilters(e?: React.FormEvent, values = filterValues) {
     e?.preventDefault()
-    const params = Object.fromEntries(Object.entries(filterValues).filter(([, v]) => v !== ''))
+    const params = Object.fromEntries(Object.entries(values).filter(([, v]) => v !== ''))
     router.get('/transactions', params, {
       preserveState: true,
       preserveScroll: true,
@@ -106,6 +113,29 @@ export default function TransactionsIndex({
   function resetFilters() {
     setFilterValues(EMPTY_FILTERS)
     router.get('/transactions', {}, { preserveState: true, preserveScroll: true, replace: true })
+  }
+
+  // Clic sur l'en-tête Date ou Montant : trie, puis inverse l'ordre au clic suivant
+  const sort = filterValues.sort || 'date_desc'
+  function sortBy(column: 'date' | 'amount') {
+    const next = sort === `${column}_desc` ? `${column}_asc` : `${column}_desc`
+    const values = { ...filterValues, sort: next === 'date_desc' ? '' : next }
+    setFilterValues(values)
+    applyFilters(undefined, values)
+  }
+  const sortHeader = (column: 'date' | 'amount', label: string) => {
+    const active = sort.startsWith(column)
+    const Icon = !active ? ArrowUpDown : sort.endsWith('asc') ? ArrowUp : ArrowDown
+    return (
+      <button
+        type="button"
+        className={`b-sort ${active ? 'b-sort--active' : ''}`}
+        onClick={() => sortBy(column)}
+      >
+        {label}
+        <Icon size={12} aria-hidden="true" />
+      </button>
+    )
   }
 
   // Mois et jour s'excluent : choisir l'un vide l'autre
@@ -225,10 +255,54 @@ export default function TransactionsIndex({
                   <input
                     id="f-search"
                     className="field__input"
-                    placeholder="Description…"
+                    placeholder="Description ou note…"
                     value={filterValues.search}
                     onChange={(e) => setFilter('search', e.target.value)}
                   />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="f-min">
+                    Montant min (€)
+                  </label>
+                  <input
+                    id="f-min"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="field__input"
+                    value={filterValues.minAmount}
+                    onChange={(e) => setFilter('minAmount', e.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="f-max">
+                    Montant max (€)
+                  </label>
+                  <input
+                    id="f-max"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="field__input"
+                    value={filterValues.maxAmount}
+                    onChange={(e) => setFilter('maxAmount', e.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="f-sort">
+                    Trier par
+                  </label>
+                  <select
+                    id="f-sort"
+                    className="field__input"
+                    value={filterValues.sort}
+                    onChange={(e) => setFilter('sort', e.target.value)}
+                  >
+                    <option value="">Plus récentes</option>
+                    <option value="date_asc">Plus anciennes</option>
+                    <option value="amount_desc">Montant décroissant</option>
+                    <option value="amount_asc">Montant croissant</option>
+                  </select>
                 </div>
                 <div className="b-row">
                   <button type="submit" className="btn btn--primary">
@@ -253,9 +327,30 @@ export default function TransactionsIndex({
                   <table className="b-table">
                     <thead>
                       <tr>
-                        <th>Date</th>
+                        <th
+                          aria-sort={
+                            sort.startsWith('date')
+                              ? sort.endsWith('asc')
+                                ? 'ascending'
+                                : 'descending'
+                              : undefined
+                          }
+                        >
+                          {sortHeader('date', 'Date')}
+                        </th>
                         <th>Description</th>
-                        <th className="b-num">Montant</th>
+                        <th
+                          className="b-num"
+                          aria-sort={
+                            sort.startsWith('amount')
+                              ? sort.endsWith('asc')
+                                ? 'ascending'
+                                : 'descending'
+                              : undefined
+                          }
+                        >
+                          {sortHeader('amount', 'Montant')}
+                        </th>
                         <th />
                       </tr>
                     </thead>

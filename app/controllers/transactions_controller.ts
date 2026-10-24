@@ -37,8 +37,13 @@ export default class TransactionsController {
       .preload('account')
       .preload('toAccount')
       .preload('category')
-      .orderBy('date', 'desc')
-      .orderBy('id', 'desc')
+
+    // Tri : plus récentes d'abord par défaut
+    const [column, direction] = (filters.sort ?? 'date_desc').split('_') as [
+      'date' | 'amount',
+      'asc' | 'desc',
+    ]
+    query.orderBy(column, direction).orderBy('date', 'desc').orderBy('id', 'desc')
 
     // On ajoute chaque filtre seulement s'il est rempli
     if (filters.month) {
@@ -57,7 +62,16 @@ export default class TransactionsController {
     }
     if (filters.categoryId) query.where('category_id', filters.categoryId)
     if (filters.type) query.where('type', filters.type)
-    if (filters.search) query.where('description', 'like', `%${filters.search}%`)
+    if (filters.search) {
+      // Cherche dans la description et dans la note
+      query.where((q) =>
+        q
+          .where('description', 'like', `%${filters.search}%`)
+          .orWhere('note', 'like', `%${filters.search}%`)
+      )
+    }
+    if (filters.minAmount !== undefined) query.where('amount', '>=', filters.minAmount)
+    if (filters.maxAmount !== undefined) query.where('amount', '<=', filters.maxAmount)
 
     const transactions = await query
     const accounts = await user.related('accounts').query().orderBy('name')
@@ -93,6 +107,9 @@ export default class TransactionsController {
         categoryId: filters.categoryId?.toString() ?? '',
         type: filters.type ?? '',
         search: filters.search ?? '',
+        minAmount: filters.minAmount?.toString() ?? '',
+        maxAmount: filters.maxAmount?.toString() ?? '',
+        sort: filters.sort ?? '',
       },
     })
   }
