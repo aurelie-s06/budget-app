@@ -22,5 +22,6 @@ declare module '@adonisjs/inertia/types' {
     'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
     'months/show': ExtractProps<(typeof import('../../inertia/pages/months/show.tsx'))['default']>
     'transactions/index': ExtractProps<(typeof import('../../inertia/pages/transactions/index.tsx'))['default']>
+    'years/show': ExtractProps<(typeof import('../../inertia/pages/years/show.tsx'))['default']>
   }
 }

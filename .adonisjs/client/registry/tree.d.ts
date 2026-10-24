@@ -16,6 +16,9 @@ export interface ApiDefinition {
   months: {
     show: typeof routes['months.show']
   }
+  years: {
+    show: typeof routes['years.show']
+  }
   categories: {
     index: typeof routes['categories.index']
     store: typeof routes['categories.store']

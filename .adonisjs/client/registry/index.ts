@@ -54,6 +54,12 @@ const routes = {
     tokens: [[0,"months"]],
     types: placeholder as Registry['months.show']['types'],
   },
+  'years.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/years',
+    tokens: [[0,"years"]],
+    types: placeholder as Registry['years.show']['types'],
+  },
   'categories.index': {
     methods: ["GET","HEAD"],
     pattern: '/categories',
