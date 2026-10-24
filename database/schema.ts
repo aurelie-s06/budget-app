@@ -8,8 +8,10 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AccountSchema extends BaseModel {
-  static $columns = ['color', 'createdAt', 'id', 'initialBalance', 'name', 'type', 'updatedAt', 'userId'] as const
+  static $columns = ['balanceDate', 'color', 'createdAt', 'id', 'initialBalance', 'name', 'type', 'updatedAt', 'userId'] as const
   $columns = AccountSchema.$columns
+  @column.date()
+  declare balanceDate: DateTime | null
   @column()
   declare color: string | null
   @column.dateTime({ autoCreate: true })

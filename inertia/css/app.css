@@ -1740,7 +1740,8 @@ select.field__input {
 .b-goal-form {
   gap: 12px;
 }
-.b-goal-form .b-row .field {
+.b-goal-form .b-row .field,
+.b-form .b-row .field {
   flex: 1;
   min-width: 0;
 }

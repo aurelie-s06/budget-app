@@ -38,8 +38,27 @@ async function savingsAccountIds(user: User) {
   return new Set(accounts.map((a) => a.id))
 }
 
+type AccountStart = { id: number; initialBalance: number; balanceDate: DateTime | null }
+
 /**
- * Solde de chaque compte : solde initial + revenus − dépenses ± virements.
+ * Solde d'un compte avant toute opération.
+ * Solde connu à une date : on retire les opérations jusqu'à ce jour inclus,
+ * ainsi une opération antérieure ajoutée plus tard ne change pas le solde actuel.
+ */
+export function startingBalance(
+  account: AccountStart,
+  transactions: (Movement & { date: DateTime })[]
+) {
+  const known = Number(account.initialBalance)
+  if (!account.balanceDate) return known
+  const until = account.balanceDate.toISODate()!
+  return transactions
+    .filter((t) => t.date.toISODate()! <= until)
+    .reduce((sum, t) => sum - balanceEffect(t, account.id), known)
+}
+
+/**
+ * Solde de chaque compte : solde de départ + revenus − dépenses ± virements.
  */
 export async function accountBalances(user: User) {
   const accounts = await user.related('accounts').query().orderBy('name')
@@ -47,7 +66,10 @@ export async function accountBalances(user: User) {
   return accounts.map((a) => ({
     account: a,
     balance: round(
-      transactions.reduce((sum, t) => sum + balanceEffect(t, a.id), Number(a.initialBalance))
+      transactions.reduce(
+        (sum, t) => sum + balanceEffect(t, a.id),
+        startingBalance(a, transactions)
+      )
     ),
   }))
 }
@@ -155,9 +177,9 @@ export async function monthlyHistory(user: User, count: number | 'all') {
   const first = count === 'all' ? (oldest < now ? oldest : now) : now.minus({ months: count - 1 })
   const length = Math.floor(now.diff(first, 'months').months) + 1
 
-  // Solde au début de la période : soldes initiaux + opérations antérieures
+  // Solde au début de la période : soldes de départ + opérations antérieures
   // (un virement entre deux comptes ne change pas le solde total)
-  let balance = accounts.reduce((sum, a) => sum + Number(a.initialBalance), 0)
+  let balance = accounts.reduce((sum, a) => sum + startingBalance(a, transactions), 0)
   for (const t of transactions) {
     if (t.date.toMillis() >= first.toMillis()) break
     if (t.type === 'income') balance += Number(t.amount)
