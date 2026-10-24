@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Icône de l'app installée : carré plein, le système arrondit les coins lui-même -->
+  <rect width="32" height="32" fill="#0a0a0b"/>
+  <g transform="translate(16 16) scale(0.84) translate(-16 -16)">
+    <rect x="10" y="6.5" width="12" height="6" rx="1.8" fill="#3ecf8e" transform="rotate(-10 16 9.5)"/>
+    <rect x="6.5" y="10" width="19" height="14" rx="3.5" fill="#f5f5f6"/>
+    <rect x="17.5" y="14.25" width="8" height="5.5" rx="2.75" fill="#0a0a0b"/>
+    <circle cx="20.5" cy="17" r="1.4" fill="#3ecf8e"/>
+  </g>
+</svg>

@@ -1,0 +1,21 @@
+{
+  "name": "Mon Budget",
+  "short_name": "Budget",
+  "description": "Suis tes comptes, tes dépenses et ton épargne.",
+  "lang": "fr",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f6",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Opérations", "short_name": "Opérations", "url": "/transactions", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Mois en cours", "short_name": "Mois", "url": "/months", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Vue annuelle", "short_name": "Année", "url": "/years", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

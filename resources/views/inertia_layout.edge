@@ -8,7 +8,17 @@
     </title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=2" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
+
+    {{-- Application installable : Safari > Fichier > Ajouter au Dock --}}
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="application-name" content="Mon Budget" />
+    <meta name="apple-mobile-web-app-title" content="Mon Budget" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="theme-color"
+      content="{{ request.plainCookie('app_theme', { defaultValue: 'light', encoded: false }) === 'dark' ? '#111114' : '#ffffff' }}"
+    />
 
     @viteReactRefresh()
     @vite(['inertia/app.tsx'])
