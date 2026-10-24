@@ -1,11 +1,21 @@
-import { Link, router, usePage } from '@inertiajs/react'
-import { ArrowLeftRight, CalendarDays, LayoutDashboard, LogOut, Tags, Wallet } from 'lucide-react'
+import { router, usePage } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
+import {
+  ArrowLeftRight,
+  CalendarDays,
+  CalendarRange,
+  LayoutDashboard,
+  LogOut,
+  Tags,
+  Wallet,
+} from 'lucide-react'
 import ThemeToggle from '~/components/theme_toggle'
 import Logo from '~/components/logo'
 
 const links = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
-  { href: '/months', label: 'Vue mensuelle', icon: CalendarDays },
+  { href: '/months', label: 'Mois', icon: CalendarDays },
+  { href: '/years', label: 'Année', icon: CalendarRange },
   { href: '/transactions', label: 'Opérations', icon: ArrowLeftRight },
   { href: '/accounts', label: 'Comptes', icon: Wallet },
   { href: '/categories', label: 'Catégories', icon: Tags },

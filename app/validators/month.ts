@@ -15,3 +15,9 @@ export const periodValidator = vine.compile(
     period: vine.enum(['6', '12', 'all']).optional(),
   })
 )
+
+export const yearValidator = vine.compile(
+  vine.object({
+    year: vine.number().withoutDecimals().range([2000, 2100]).optional(),
+  })
+)

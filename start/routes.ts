@@ -30,6 +30,9 @@ router
     // Vue mensuelle
     router.get('months', [controllers.Months, 'show']).as('months.show')
 
+    // Vue annuelle
+    router.get('years', [controllers.Years, 'show']).as('years.show')
+
     // Catégories
     router.get('categories', [controllers.Categories, 'index']).as('categories.index')
     router.post('categories', [controllers.Categories, 'store']).as('categories.store')

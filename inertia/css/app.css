@@ -2017,3 +2017,90 @@ a.b-cal__day:hover {
     padding-right: 16px;
   }
 }
+
+/* ==========================================================================
+   Vue annuelle : tableau catégories × mois
+   ========================================================================== */
+.b-year {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.b-year th,
+.b-year td {
+  padding: 8px 6px;
+  white-space: nowrap;
+}
+.b-year thead th {
+  letter-spacing: 0.02em;
+}
+.b-year thead th a {
+  color: inherit;
+}
+.b-year thead th a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.b-year__current a {
+  color: var(--ink);
+  font-weight: 600;
+}
+.b-year__future {
+  opacity: 0.5;
+}
+/* Première colonne figée quand le tableau défile horizontalement */
+.b-year tbody th,
+.b-year tfoot th,
+.b-year thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding-right: 12px;
+  background: var(--card);
+  text-align: left;
+  font-weight: 500;
+}
+.b-year tbody th {
+  border-top: 1px solid var(--line);
+}
+.b-year__cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.b-year td {
+  border-radius: 4px;
+  border-top: 2px solid var(--card);
+}
+.b-year__total {
+  font-weight: 600;
+  padding-left: 14px !important;
+}
+.b-year__avg {
+  color: var(--muted);
+}
+.b-year tfoot th,
+.b-year tfoot td {
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+.b-year tfoot tr:first-child th,
+.b-year tfoot tr:first-child td {
+  border-top: 1px solid var(--line-2);
+  font-weight: 600;
+}
+
+/* En-têtes de colonne triables (Opérations) */
+.b-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+}
+.b-sort:hover,
+.b-sort--active {
+  color: var(--ink);
+}

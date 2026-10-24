@@ -242,3 +242,74 @@ export async function savingsGoalProgress(user: User) {
     monthlyNeeded,
   }
 }
+
+/**
+ * Bilan d'une année : chiffres de chaque mois et dépenses par catégorie et par mois.
+ */
+export async function yearSummary(user: User, year: number) {
+  const start = DateTime.fromObject({ year, month: 1, day: 1 })
+  const savingsIds = await savingsAccountIds(user)
+  const transactions = await user
+    .related('transactions')
+    .query()
+    .whereBetween('date', [start.toISODate()!, start.endOf('year').toISODate()!])
+  const categories = await user.related('categories').query().orderBy('name')
+
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const ofMonth = transactions.filter((t) => t.date.month === i + 1)
+    const sum = (type: string) =>
+      ofMonth.filter((t) => t.type === type).reduce((s, t) => s + Number(t.amount), 0)
+    const income = sum('income')
+    const expenses = sum('expense')
+    const savings = ofMonth.reduce((s, t) => s + savingsEffect(t, savingsIds), 0)
+    return {
+      month: start.plus({ months: i }).toFormat('yyyy-MM'),
+      income: round(income),
+      expenses: round(expenses),
+      savings: round(savings),
+      rest: round(income - expenses - savings),
+    }
+  })
+
+  // Dépenses d'une catégorie (null = sans catégorie) pour chacun des 12 mois
+  const spentByMonth = (categoryId: number | null) =>
+    Array.from({ length: 12 }, (_, i) =>
+      round(
+        transactions
+          .filter(
+            (t) => t.type === 'expense' && t.categoryId === categoryId && t.date.month === i + 1
+          )
+          .reduce((s, t) => s + Number(t.amount), 0)
+      )
+    )
+
+  const rows = [
+    ...categories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      color: c.color,
+      monthlyBudget: c.monthlyBudget !== null ? Number(c.monthlyBudget) : null,
+      months: spentByMonth(c.id),
+    })),
+    {
+      id: null,
+      name: 'Sans catégorie',
+      color: null,
+      monthlyBudget: null,
+      months: spentByMonth(null),
+    },
+  ]
+    .map((r) => ({ ...r, total: round(r.months.reduce((s, m) => s + m, 0)) }))
+    .filter((r) => r.total > 0)
+    .sort((a, b) => b.total - a.total)
+
+  return { months, categories: rows }
+}
+
+/**
+ * Années ayant au moins une opération, plus l'année en cours.
+ */
+export async function activeYears(user: User) {
+  const dates = await user.related('transactions').query().select('date')
+  return [...new Set([DateTime.now().year, ...dates.map((t) => t.date.year)])].sort()
+}
