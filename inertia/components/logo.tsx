@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 
 /**
  * Logo de Mon Budget : un portefeuille avec une carte qui dépasse et un

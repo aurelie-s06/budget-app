@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 
 const TOKENS = ['in', 'out', 'card', 'muted', 'line', 'ink'] as const
 type Colors = Record<(typeof TOKENS)[number], string>
@@ -20,19 +20,23 @@ function read(): Colors {
   ) as Colors
 }
 
+// Prévient React quand l'attribut data-theme de <html> change
+function subscribe(onChange: () => void) {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  })
+  return () => observer.disconnect()
+}
+const currentTheme = () => document.documentElement.getAttribute('data-theme') ?? 'light'
+
 /**
  * Chart.js dessine sur un canvas et ne lit pas les variables CSS :
  * on les récupère ici et on les relit quand le thème change.
  */
 export default function useThemeColors() {
-  const [colors, setColors] = useState<Colors>(FALLBACK)
-
-  useEffect(() => {
-    setColors(read())
-    const observer = new MutationObserver(() => setColors(read()))
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => observer.disconnect()
-  }, [])
-
-  return colors
+  // null côté serveur : pas de document, on garde les couleurs par défaut
+  const theme = useSyncExternalStore(subscribe, currentTheme, () => null)
+  return useMemo(() => (theme === null ? FALLBACK : read()), [theme])
 }

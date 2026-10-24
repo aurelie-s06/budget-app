@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import Logo from '~/components/logo'
 import Footer from '~/components/footer'
 import ThemeToggle from '~/components/theme_toggle'
@@ -25,7 +25,7 @@ export default function Home() {
         <span className="tag">Gestionnaire de budget personnel</span>
         <h1 className="b-hero__title">Reprends le contrôle de ton budget, simplement.</h1>
         <p className="b-hero__text">
-          Mon Budget centralise tes comptes, tes revenus et tes dépenses pour t'aider à comprendre
+          Mon Budget centralise tes comptes, tes revenus et tes dépenses pour t’aider à comprendre
           où part ton argent et à respecter tes objectifs chaque mois.
         </p>
         <div className="b-hero__actions">
@@ -33,7 +33,7 @@ export default function Home() {
             Commencer gratuitement
           </Link>
           <Link href="/login" className="btn btn--secondary">
-            J'ai déjà un compte
+            J’ai déjà un compte
           </Link>
         </div>
         <ul className="b-pills">

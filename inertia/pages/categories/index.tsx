@@ -66,7 +66,7 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
           <div className="b-split">
             <section className="panel">
               {categories.length === 0 ? (
-                <p className="b-empty">Aucune catégorie pour l'instant.</p>
+                <p className="b-empty">Aucune catégorie pour l’instant.</p>
               ) : (
                 <ul className="b-list">
                   {categories.map((c) => (

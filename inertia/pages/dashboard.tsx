@@ -1,4 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import MonthlyChart from '~/components/monthly_chart'

@@ -42,7 +42,12 @@ export default function ExpensesChart({ items }: { items: Item[] }) {
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: colors.muted, usePointStyle: true, pointStyle: 'circle', padding: 14 },
+              labels: {
+                color: colors.muted,
+                usePointStyle: true,
+                pointStyle: 'circle',
+                padding: 14,
+              },
             },
             tooltip: {
               callbacks: {

@@ -1,4 +1,5 @@
-import { Head, Link, router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import Footer from '~/components/footer'

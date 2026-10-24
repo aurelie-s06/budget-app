@@ -80,7 +80,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
           <div className="b-split">
             <section className="panel">
               {accounts.length === 0 ? (
-                <p className="b-empty">Aucun compte pour l'instant.</p>
+                <p className="b-empty">Aucun compte pour l’instant.</p>
               ) : (
                 <ul className="b-list">
                   {accounts.map((a) => (
