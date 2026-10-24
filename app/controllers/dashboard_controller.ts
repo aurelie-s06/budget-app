@@ -17,8 +17,9 @@ export default class DashboardController {
     const { period = '12' } = await request.validateUsing(periodValidator)
     const now = DateTime.now()
 
-    // Solde total de tous les comptes
+    // Solde mis en avant : le compte courant, sinon le total de tous les comptes
     const balances = await accountBalances(user)
+    const main = balances.find((b) => b.account.type === 'courant')
     const totalBalance = balances.reduce((sum, b) => sum + b.balance, 0)
 
     // Chiffres du mois en cours
@@ -26,13 +27,18 @@ export default class DashboardController {
 
     return inertia.render('dashboard', {
       period,
-      totalBalance: round(totalBalance),
-      accounts: balances.map(({ account: a, balance }) => ({
-        id: a.id,
-        name: a.name,
-        type: a.type,
-        balance,
-      })),
+      mainBalance: main
+        ? { name: main.account.name, balance: main.balance }
+        : { name: 'Solde total', balance: round(totalBalance) },
+      // Les autres comptes, affichés en dessous
+      accounts: balances
+        .filter((b) => b !== main)
+        .map(({ account: a, balance }) => ({
+          id: a.id,
+          name: a.name,
+          type: a.type,
+          balance,
+        })),
       income: summary.income,
       expenses: summary.expenses,
       savings: summary.savings,

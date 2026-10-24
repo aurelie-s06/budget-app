@@ -10,7 +10,7 @@ import SavingsGoal, { type Goal } from '~/components/savings_goal'
 type Period = '6' | '12' | 'all'
 type Props = {
   period: Period
-  totalBalance: number
+  mainBalance: { name: string; balance: number }
   accounts: { id: number; name: string; type: string; balance: number }[]
   income: number
   expenses: number
@@ -74,9 +74,11 @@ export default function Dashboard(props: Props) {
           <div className="b-dash">
             {/* Solde */}
             <section className="b-tile b-span-4">
-              <h2 className="b-tile__label">Solde total</h2>
-              <div className={`b-tile__value ${props.totalBalance < 0 ? 'b-amount--out' : ''}`}>
-                {euros(props.totalBalance)}
+              <h2 className="b-tile__label">{props.mainBalance.name}</h2>
+              <div
+                className={`b-tile__value ${props.mainBalance.balance < 0 ? 'b-amount--out' : ''}`}
+              >
+                {euros(props.mainBalance.balance)}
               </div>
               <ul className="b-accounts">
                 {props.accounts.map((a) => (
