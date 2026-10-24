@@ -25,8 +25,14 @@ Permettre à un utilisateur de centraliser ses comptes, d'enregistrer ses revenu
 ### Opérations
 - CRUD complet des revenus et des dépenses
 - Association à un compte et à une catégorie
-- Filtres par mois, compte, catégorie et type, et recherche dans la description
+- Filtres par mois, compte, catégorie, type et montant (minimum / maximum)
+- Recherche dans la description et dans la note
+- Tri par date ou par montant
 - Les filtres sont conservés dans l'URL
+
+### Vue annuelle
+- Revenus, dépenses, épargne et reste de chaque mois de l'année
+- Tableau des dépenses par catégorie et par mois, avec le total de l'année
 
 ### Tableau de bord
 - Solde total, revenus, dépenses et épargne du mois
@@ -48,32 +54,95 @@ Permettre à un utilisateur de centraliser ses comptes, d'enregistrer ses revenu
 | Langage | TypeScript |
 | Dates | Luxon |
 
-## Installation et lancement
+## Installation en local
 
-Prérequis : Node.js (version indiquée dans `package.json`, champ `engines`) et npm.
+### Prérequis
+
+- **Node.js 24 ou plus récent** (champ `engines` de `package.json`). Vérifier avec `node -v`.
+- **npm** (installé avec Node.js).
+- **Git**.
+
+Aucune base de données à installer : SQLite est un simple fichier créé automatiquement dans le projet.
+
+### 1. Récupérer le projet
 
 ```bash
-# 1. Cloner le dépôt
 git clone https://github.com/aurelie-s06/budget-app.git
 cd budget-app
+```
 
-# 2. Installer les dépendances
+### 2. Installer les dépendances
+
+```bash
 npm install
+```
 
-# 3. Créer le fichier d'environnement
+### 3. Configurer l'environnement
+
+```bash
+# Copier le modèle de configuration
 cp .env.example .env
 
-# 4. Générer la clé de l'application
+# Générer la clé secrète de l'application (remplit APP_KEY dans .env)
 node ace generate:key
+```
 
-# 5. Créer les tables de la base de données
+Par défaut, l'application écoute sur le port `3333` (variables `PORT` et `HOST` du fichier `.env`).
+
+### 4. Créer la base de données
+
+```bash
 node ace migration:run
+```
 
-# 6. Lancer le serveur de développement
+Cette commande crée le fichier SQLite et toutes les tables.
+
+### 5. Lancer l'application
+
+```bash
 npm run dev
 ```
 
-L'application est ensuite disponible sur http://localhost:3333. Créez un compte via « Create an account » pour commencer.
+L'application est disponible sur http://localhost:3333. Cliquer sur « Commencer gratuitement » pour créer un compte : les catégories par défaut sont ajoutées automatiquement.
+
+Pour arrêter le serveur : `Ctrl + C` dans le terminal.
+
+### Commandes utiles
+
+| Commande | Rôle |
+|---|---|
+| `npm run dev` | Serveur de développement avec rechargement automatique |
+| `npm run lint` | Vérifie le code avec ESLint |
+| `npm run typecheck` | Vérifie les types TypeScript (serveur et React) |
+| `npm run format` | Formate le code avec Prettier |
+| `npm run build` puis `npm start` | Version de production (lancée depuis le dossier `build/`, avec son propre `.env`) |
+| `node ace migration:rollback` | Annule la dernière migration |
+
+### Optionnel : démarrage automatique sous macOS
+
+Un script installe un service macOS (LaunchAgent) qui lance Mon Budget à chaque ouverture de session et le relance s'il s'arrête. Il utilise ses propres ports pour ne pas gêner d'autres projets AdonisJS.
+
+```bash
+# Installer (à lancer une seule fois, depuis un terminal où « node -v » fonctionne)
+bash scripts/autostart/install.sh
+
+# Désinstaller
+bash scripts/autostart/uninstall.sh
+```
+
+L'application est alors disponible sur http://monbudget.localhost:4848. Le journal du serveur se trouve dans `~/Library/Logs/monbudget.log`.
+
+Si le port `4848` ou `24848` est déjà utilisé, modifier `PORT` et `HMR_PORT` en haut du script `install.sh`.
+
+### Optionnel : installer l'application
+
+Mon Budget peut s'installer comme une application, avec sa propre icône et sa propre fenêtre :
+
+- **Safari (macOS)** : menu Fichier › Ajouter au Dock ;
+- **Chrome / Edge** : icône d'installation dans la barre d'adresse ;
+- **iPhone (Safari)** : Partager › Sur l'écran d'accueil.
+
+Le serveur doit tourner pour que l'application fonctionne (le démarrage automatique ci-dessus s'en charge).
 
 ## Structure des données
 
@@ -96,15 +165,19 @@ Le montant est toujours enregistré en positif : c'est le champ `type` qui indiq
 
 ```
 app/
-  controllers/   → dashboard, accounts, categories, transactions
+  controllers/   → dashboard, months, years, accounts, categories, transactions
+  services/      → calculs du budget (soldes, bilans du mois et de l'année)
   models/        → User, Account, Category, Transaction (avec leurs relations)
   validators/    → validation VineJS des formulaires et des filtres
 database/
   migrations/    → création des tables
 inertia/
-  pages/         → pages React (dashboard, accounts, categories, transactions)
-  components/    → navigation, graphique
+  pages/         → pages React (dashboard, months, years, accounts, categories, transactions)
+  components/    → navigation, graphiques, calendrier
   css/app.css    → styles
+public/          → icônes et manifeste de l'application installable
+scripts/
+  autostart/     → démarrage automatique sous macOS
 start/
   routes.ts      → routes, protégées par le middleware auth
 ```
