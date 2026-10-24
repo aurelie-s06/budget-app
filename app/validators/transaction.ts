@@ -1,7 +1,7 @@
 import vine from '@vinejs/vine'
 
 // Un virement doit arriver sur un autre compte que celui de départ
-const otherAccount = vine.createRule((value, _, field) => {
+export const otherAccount = vine.createRule((value, _, field) => {
   if (value === field.parent.accountId) {
     field.report('Choisis un compte différent du compte de départ', 'otherAccount', field)
   }

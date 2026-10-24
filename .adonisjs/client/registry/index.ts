@@ -144,6 +144,30 @@ const routes = {
     tokens: [[0,"transactions"],[1,"id"]],
     types: placeholder as Registry['transactions.destroy']['types'],
   },
+  'recurring.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/recurring',
+    tokens: [[0,"recurring"]],
+    types: placeholder as Registry['recurring.index']['types'],
+  },
+  'recurring.store': {
+    methods: ["POST"],
+    pattern: '/recurring',
+    tokens: [[0,"recurring"]],
+    types: placeholder as Registry['recurring.store']['types'],
+  },
+  'recurring.update': {
+    methods: ["PUT"],
+    pattern: '/recurring/:id',
+    tokens: [[0,"recurring"],[1,"id"]],
+    types: placeholder as Registry['recurring.update']['types'],
+  },
+  'recurring.destroy': {
+    methods: ["DELETE"],
+    pattern: '/recurring/:id',
+    tokens: [[0,"recurring"],[1,"id"]],
+    types: placeholder as Registry['recurring.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

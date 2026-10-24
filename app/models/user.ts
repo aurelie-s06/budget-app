@@ -7,6 +7,7 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import Account from '#models/account'
 import Category from '#models/category'
 import Transaction from '#models/transaction'
+import RecurringTransaction from '#models/recurring_transaction'
 
 export default class User extends compose(UserSchema, withAuthFinder(hash)) {
   @hasMany(() => Account)
@@ -17,6 +18,9 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
 
   @hasMany(() => Transaction)
   declare transactions: HasMany<typeof Transaction>
+
+  @hasMany(() => RecurringTransaction)
+  declare recurringTransactions: HasMany<typeof RecurringTransaction>
 
   get initials() {
     const [first, last] = this.fullName ? this.fullName.split(' ') : this.email.split('@')

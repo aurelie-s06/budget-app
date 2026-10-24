@@ -49,6 +49,39 @@ export class CategorySchema extends BaseModel {
   declare userId: number
 }
 
+export class RecurringTransactionSchema extends BaseModel {
+  static $columns = ['accountId', 'amount', 'categoryId', 'createdAt', 'description', 'endDate', 'frequency', 'generatedCount', 'id', 'startDate', 'toAccountId', 'type', 'updatedAt', 'userId'] as const
+  $columns = RecurringTransactionSchema.$columns
+  @column()
+  declare accountId: number
+  @column()
+  declare amount: number
+  @column()
+  declare categoryId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column()
+  declare description: string
+  @column.date()
+  declare endDate: DateTime | null
+  @column()
+  declare frequency: string
+  @column()
+  declare generatedCount: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column.date()
+  declare startDate: DateTime
+  @column()
+  declare toAccountId: number | null
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class SavingsGoalSchema extends BaseModel {
   static $columns = ['createdAt', 'deadline', 'id', 'name', 'startDate', 'targetAmount', 'updatedAt', 'userId'] as const
   $columns = SavingsGoalSchema.$columns
@@ -71,7 +104,7 @@ export class SavingsGoalSchema extends BaseModel {
 }
 
 export class TransactionSchema extends BaseModel {
-  static $columns = ['accountId', 'amount', 'categoryId', 'createdAt', 'date', 'description', 'id', 'note', 'toAccountId', 'type', 'updatedAt', 'userId'] as const
+  static $columns = ['accountId', 'amount', 'categoryId', 'createdAt', 'date', 'description', 'id', 'note', 'recurringId', 'toAccountId', 'type', 'updatedAt', 'userId'] as const
   $columns = TransactionSchema.$columns
   @column()
   declare accountId: number
@@ -89,6 +122,8 @@ export class TransactionSchema extends BaseModel {
   declare id: number
   @column()
   declare note: string | null
+  @column()
+  declare recurringId: number | null
   @column()
   declare toAccountId: number | null
   @column()

@@ -1,8 +1,9 @@
 import { Head, router } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Repeat } from 'lucide-react'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
 
 type Transaction = EditableTransaction & {
@@ -10,6 +11,8 @@ type Transaction = EditableTransaction & {
   toAccountName: string | null
   categoryName: string | null
   categoryColor: string | null
+  // Créée automatiquement par une opération récurrente
+  recurring: boolean
 }
 type Option = { id: number; name: string }
 type Filters = {
@@ -68,6 +71,12 @@ export default function TransactionsIndex({
       <div>
         <h1 className="page__title">Opérations</h1>
         <p className="page__description">Tes revenus, dépenses et virements, compte par compte.</p>
+      </div>
+      <div className="page__actions">
+        <Link href="/recurring" className="btn btn--secondary">
+          <Repeat size={16} aria-hidden="true" />
+          Récurrentes
+        </Link>
       </div>
     </header>
   )
@@ -361,7 +370,16 @@ export default function TransactionsIndex({
                             {new Date(t.date).toLocaleDateString('fr-FR')}
                           </td>
                           <td>
-                            <div className="b-item__title">{t.description}</div>
+                            <div className="b-item__title">
+                              {t.description}
+                              {t.recurring && (
+                                <Repeat
+                                  size={12}
+                                  className="b-recurring"
+                                  aria-label="Opération récurrente"
+                                />
+                              )}
+                            </div>
                             <div
                               className="b-item__meta"
                               style={{ display: 'flex', alignItems: 'center', gap: 6 }}

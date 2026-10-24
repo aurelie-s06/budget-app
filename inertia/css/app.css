@@ -2105,3 +2105,22 @@ a.b-cal__day:hover {
 .b-sort--active {
   color: var(--ink);
 }
+
+/* ==========================================================================
+   Opérations récurrentes
+   ========================================================================== */
+.b-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.b-item--ended {
+  opacity: 0.55;
+}
+.b-recurring {
+  margin-left: 6px;
+  vertical-align: -1px;
+  color: var(--muted);
+}

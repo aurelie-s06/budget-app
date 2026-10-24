@@ -1,30 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
-import type User from '#models/user'
+import { checkOwnership, cleanup } from '#services/ownership_service'
 import { transactionValidator, transactionFiltersValidator } from '#validators/transaction'
-
-// Vérifie que le compte et la catégorie appartiennent à l'utilisateur (sinon : 404)
-async function checkOwnership(
-  user: User,
-  accountId: number,
-  categoryId?: number | null,
-  toAccountId?: number | null
-) {
-  await user.related('accounts').query().where('id', accountId).firstOrFail()
-  if (toAccountId) {
-    await user.related('accounts').query().where('id', toAccountId).firstOrFail()
-  }
-  if (categoryId) {
-    await user.related('categories').query().where('id', categoryId).firstOrFail()
-  }
-}
-
-// Un virement n'a pas de catégorie ; une dépense ou un revenu n'a pas de compte d'arrivée
-function cleanup<
-  T extends { type: string; toAccountId?: number | null; categoryId?: number | null },
->(data: T) {
-  return data.type === 'transfer' ? { ...data, categoryId: null } : { ...data, toAccountId: null }
-}
 
 export default class TransactionsController {
   async index({ auth, inertia, request }: HttpContext) {
@@ -96,6 +73,7 @@ export default class TransactionsController {
         toAccountName: t.toAccount?.name ?? null,
         categoryName: t.category?.name ?? null,
         categoryColor: t.category?.color ?? null,
+        recurring: t.recurringId !== null,
       })),
       accounts: accounts.map((a) => ({ id: a.id, name: a.name, type: a.type })),
       categories: categories.map((c) => ({ id: c.id, name: c.name })),

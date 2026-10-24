@@ -306,4 +306,56 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/transactions_controller').default['destroy']>>>
     }
   }
+  'recurring.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/recurring'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['index']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['index']>>>
+    }
+  }
+  'recurring.store': {
+    methods: ["POST"]
+    pattern: '/recurring'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/recurring_transaction').recurringTransactionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/recurring_transaction').recurringTransactionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'recurring.update': {
+    methods: ["PUT"]
+    pattern: '/recurring/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/recurring_transaction').recurringTransactionValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/recurring_transaction').recurringTransactionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'recurring.destroy': {
+    methods: ["DELETE"]
+    pattern: '/recurring/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['destroy']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['destroy']>>>
+    }
+  }
 }

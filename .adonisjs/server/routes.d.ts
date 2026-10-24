@@ -27,6 +27,10 @@ export type ScannedRoutes = {
     'transactions.store': { paramsTuple?: []; params?: {} }
     'transactions.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'transactions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring.index': { paramsTuple?: []; params?: {} }
+    'recurring.store': { paramsTuple?: []; params?: {} }
+    'recurring.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'home': { paramsTuple?: []; params?: {} }
@@ -38,6 +42,7 @@ export type ScannedRoutes = {
     'categories.index': { paramsTuple?: []; params?: {} }
     'accounts.index': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
+    'recurring.index': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'home': { paramsTuple?: []; params?: {} }
@@ -49,6 +54,7 @@ export type ScannedRoutes = {
     'categories.index': { paramsTuple?: []; params?: {} }
     'accounts.index': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
+    'recurring.index': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'new_account.store': { paramsTuple?: []; params?: {} }
@@ -57,18 +63,21 @@ export type ScannedRoutes = {
     'categories.store': { paramsTuple?: []; params?: {} }
     'accounts.store': { paramsTuple?: []; params?: {} }
     'transactions.store': { paramsTuple?: []; params?: {} }
+    'recurring.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'categories.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'accounts.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'savings_goal.update': { paramsTuple?: []; params?: {} }
     'transactions.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'categories.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'savings_goal.destroy': { paramsTuple?: []; params?: {} }
     'transactions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

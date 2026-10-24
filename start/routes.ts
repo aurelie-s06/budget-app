@@ -56,5 +56,15 @@ router
     router
       .delete('transactions/:id', [controllers.Transactions, 'destroy'])
       .as('transactions.destroy')
+
+    // Opérations récurrentes
+    router.get('recurring', [controllers.RecurringTransactions, 'index']).as('recurring.index')
+    router.post('recurring', [controllers.RecurringTransactions, 'store']).as('recurring.store')
+    router
+      .put('recurring/:id', [controllers.RecurringTransactions, 'update'])
+      .as('recurring.update')
+    router
+      .delete('recurring/:id', [controllers.RecurringTransactions, 'destroy'])
+      .as('recurring.destroy')
   })
-  .use(middleware.auth())
+  .use([middleware.auth(), middleware.recurring()])
