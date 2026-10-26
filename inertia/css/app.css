@@ -2151,23 +2151,23 @@ a.b-cal__day:hover {
 .b-settings__head .section__description {
   margin-top: 4px;
 }
-.b-stats {
+.b-counts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
   margin: 0;
 }
-.b-stats div {
+.b-counts div {
   padding: 12px 14px;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r);
 }
-.b-stats dt {
+.b-counts dt {
   font-size: 12.5px;
   color: var(--muted);
 }
-.b-stats dd {
+.b-counts dd {
   margin: 2px 0 0;
   font-size: 18px;
   font-weight: 600;
@@ -2265,43 +2265,300 @@ form.b-import {
 .b-check--warn svg {
   color: var(--out);
 }
-.b-import__table td {
-  vertical-align: top;
+/* Barre d'actions collée en bas pendant la vérification */
+.b-import__bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
-.b-import__table input[type='checkbox'] {
+.b-import__totals {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.b-import__totals strong {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   Corrections d'affichage
+   ========================================================================== */
+/* Champs côte à côte du profil : même largeur */
+.b-settings .b-row .field {
+  flex: 1;
+  min-width: 0;
+}
+/* Listes sur plusieurs lignes : le point reste en face du titre */
+.b-list--top .b-dot {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+/* La grille ne doit pas s'élargir au-delà de l'écran à cause du tableau */
+.b-import {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 720px) {
+  /* Opérations : une carte par ligne au lieu de 4 colonnes */
+  .b-tx thead {
+    display: none;
+  }
+  .b-tx tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'desc amount';
+    gap: 4px 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+  .b-tx tbody tr:first-child {
+    border-top: none;
+  }
+  .b-tx td {
+    display: block;
+    padding: 0 !important;
+    border: none;
+  }
+  .b-tx td:nth-child(1) {
+    grid-area: 2 / 1;
+    align-self: center;
+    font-size: 12.5px;
+  }
+  .b-tx td:nth-child(2) {
+    grid-area: desc;
+  }
+  .b-tx td:nth-child(3) {
+    grid-area: amount;
+  }
+  /* Sur toute la largeur, sans élargir la colonne du montant */
+  .b-tx td:nth-child(4) {
+    grid-area: 2 / 1 / 3 / -1;
+    justify-self: end;
+  }
+
+  .b-import__bar {
+    bottom: 8px;
+    padding: 10px 12px;
+  }
+  .b-import__bar .b-row {
+    width: 100%;
+  }
+  .b-import__bar .btn {
+    flex: 1;
+  }
+}
+
+/* ==========================================================================
+   Aperçu d'import : une ligne lisible par opération, modifiable au clic
+   ========================================================================== */
+.b-review {
+  padding: 8px 0;
+}
+.b-review__summary {
+  display: grid;
+  gap: 14px;
+}
+.b-review__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 24px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.b-review__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.b-review__tip {
+  font-size: 12.5px;
+  color: var(--subtle);
+}
+.b-review__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.b-review__item + .b-review__item {
+  border-top: 1px solid var(--line);
+}
+.b-review__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px 0 24px;
+}
+.b-review__check,
+.b-review__all input {
+  flex: none;
   width: 16px;
   height: 16px;
-  margin-top: 8px;
+  margin: 0;
   accent-color: var(--ink);
+  cursor: pointer;
 }
-.b-input-sm {
-  height: 32px;
-  padding: 0 8px;
-  font-size: 13.5px;
-  min-width: 150px;
+/* Toute la ligne (sauf la case) ouvre le panneau */
+.b-review__main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 8px;
+  margin: 4px 0;
+  border-radius: var(--r);
+  text-align: left;
+  transition: background 0.15s;
 }
-.b-import__table td:nth-child(3) {
-  width: 100%;
+.b-review__main:hover,
+.b-review__item.is-open .b-review__main {
+  background: var(--paper);
 }
-.b-import__table td:nth-child(3) .b-input-sm {
-  width: 100%;
+.b-review__date {
+  flex: none;
+  width: 52px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
-.b-import__label {
-  max-width: 420px;
-  margin-top: 4px;
+.b-review__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
+.b-review__title {
   overflow: hidden;
-  font-size: 11.5px;
-  color: var(--subtle);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.b-import__table td.b-amount {
-  padding-top: 14px;
+.b-review__title em {
+  font-style: normal;
+  color: var(--out);
+}
+.b-review__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.b-review__cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.b-review__cat .b-dot {
+  width: 8px;
+  height: 8px;
+}
+.b-review__cat.is-empty {
+  color: var(--subtle);
+}
+.b-review__amount {
+  flex: none;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.b-import__off {
-  opacity: 0.5;
+.b-review__chevron {
+  flex: none;
+  color: var(--subtle);
+  transition: rotate 0.15s;
 }
-.b-import__actions {
-  margin-top: 16px;
+.b-review__item.is-open .b-review__chevron {
+  rotate: 180deg;
+}
+/* Ligne décochée : estompée, la case reste nette */
+.b-review__item.is-off .b-review__main {
+  opacity: 0.45;
+}
+.b-badge--ink {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.b-badge--out {
+  border-color: var(--out);
+  color: var(--out);
+}
+/* Panneau de modification, aligné sur le texte de la ligne */
+.b-review__edit {
+  display: grid;
+  gap: 14px;
+  margin: 0 16px 16px 54px;
+  padding: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.b-review__source {
+  margin: 0;
+  font-size: 12px;
+  color: var(--subtle);
+  overflow-wrap: anywhere;
+}
+.b-review__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+.b-review__wide {
+  grid-column: 1 / -1;
+}
+.b-review__edit .field__input {
+  background: var(--card);
+}
+.b-review__actions {
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 720px) {
+  .b-review__head {
+    padding: 10px 16px 12px;
+  }
+  .b-review__row {
+    gap: 10px;
+    padding: 0 8px 0 16px;
+  }
+  .b-review__main {
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    padding: 10px 6px;
+  }
+  /* Date au-dessus du titre, montant à droite */
+  .b-review__date {
+    order: -1;
+    width: 100%;
+  }
+  .b-review__chevron {
+    display: none;
+  }
+  .b-review__edit {
+    margin: 0 12px 14px;
+    padding: 14px;
+  }
+  .b-review__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

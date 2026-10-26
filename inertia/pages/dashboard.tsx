@@ -116,7 +116,8 @@ export default function Dashboard(props: Props) {
                 <div>
                   <dt>Épargne</dt>
                   <dd className="b-amount--move">
-                    {props.savings < 0 ? '+' : '−'} {euros(Math.abs(props.savings))}
+                    {props.savings === 0 ? '' : props.savings < 0 ? '+ ' : '− '}
+                    {euros(Math.abs(props.savings))}
                   </dd>
                 </div>
                 <div className="b-figures__total">

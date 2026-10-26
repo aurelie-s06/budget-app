@@ -205,7 +205,7 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                       </span>{' '}
                       par mois
                     </p>
-                    <ul className="b-list">
+                    <ul className="b-list b-list--top">
                       {rules.map((r) => (
                         <li
                           key={r.id}

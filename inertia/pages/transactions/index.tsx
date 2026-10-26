@@ -109,6 +109,16 @@ export default function TransactionsIndex({
     )
   }
 
+  // Sur téléphone, le formulaire est sous la liste : on l'amène à l'écran
+  function edit(id: number) {
+    setEditingId(id)
+    requestAnimationFrame(() =>
+      document
+        .querySelector('.b-split > form')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    )
+  }
+
   function remove(t: Transaction) {
     if (confirm(`Supprimer « ${t.description} » ?`)) router.delete(`/transactions/${t.id}`)
   }
@@ -337,7 +347,7 @@ export default function TransactionsIndex({
                 <p className="b-empty">Aucune opération.</p>
               ) : (
                 <div className="b-table-wrap">
-                  <table className="b-table">
+                  <table className="b-table b-tx">
                     <thead>
                       <tr>
                         <th
@@ -386,7 +396,12 @@ export default function TransactionsIndex({
                             </div>
                             <div
                               className="b-item__meta"
-                              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                              style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                gap: 6,
+                              }}
                             >
                               {t.categoryName && (
                                 <>
@@ -398,7 +413,8 @@ export default function TransactionsIndex({
                                       background: t.categoryColor ?? 'var(--subtle)',
                                     }}
                                   />
-                                  {t.categoryName} ·
+                                  {t.categoryName}
+                                  <span aria-hidden="true">·</span>
                                 </>
                               )}
                               {t.type === 'transfer'
@@ -411,7 +427,7 @@ export default function TransactionsIndex({
                           </td>
                           <td>
                             <div className="b-actions" style={{ justifyContent: 'flex-end' }}>
-                              <button className="b-link" onClick={() => setEditingId(t.id)}>
+                              <button className="b-link" onClick={() => edit(t.id)}>
                                 Modifier
                               </button>
                               <button className="b-link b-link--danger" onClick={() => remove(t)}>

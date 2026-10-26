@@ -1,7 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react'
 import { Link } from '@adonisjs/inertia/react'
-import { useState } from 'react'
-import { ArrowLeft, CircleAlert, CircleCheck, FileText } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { ArrowLeft, ChevronDown, CircleAlert, CircleCheck, FileText } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 
@@ -157,6 +157,25 @@ function UploadStep({ accounts }: { accounts: Props['accounts'] }) {
   )
 }
 
+// Ligne de l'aperçu : le montant reste du texte tant qu'on le modifie
+type EditableLine = Line & { selected: boolean; amountText: string; noteText: string }
+
+const toEditable = (l: Line): EditableLine => ({
+  ...l,
+  selected: l.duplicateOf === null,
+  amountText: l.amount.toFixed(2).replace('.', ','),
+  noteText: l.note ?? '',
+})
+
+// « 12,50 » ou « 12.50 » → 12.5 ; null si invalide
+function parseAmount(text: string) {
+  const value = Number(text.trim().replace(/\s/g, '').replace(',', '.'))
+  return Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null
+}
+
+// Ce qu'on compare pour savoir si une ligne a été modifiée
+const FIELDS = ['date', 'description', 'target', 'direction', 'amountText', 'noteText'] as const
+
 function PreviewStep({
   preview,
   accounts,
@@ -166,15 +185,16 @@ function PreviewStep({
   accounts: Props['accounts']
   categories: Props['categories']
 }) {
+  const original = useMemo(() => preview.lines.map(toEditable), [preview])
   // Lignes modifiables ; les doublons sont décochés
-  const [lines, setLines] = useState(() =>
-    preview.lines.map((l) => ({ ...l, selected: l.duplicateOf === null }))
-  )
+  const [lines, setLines] = useState(original)
   const [processing, setProcessing] = useState(false)
+  // Ligne dont le panneau de modification est ouvert
+  const [open, setOpen] = useState<number | null>(null)
   const account = accounts.find((a) => a.id === preview.accountId)
   const otherAccounts = accounts.filter((a) => a.id !== preview.accountId)
 
-  const update = (index: number, changes: Partial<(typeof lines)[number]>) =>
+  const update = (index: number, changes: Partial<EditableLine>) =>
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...changes } : l)))
 
   // Renommer ou classer une ligne fait de même pour les lignes identiques encore inchangées
@@ -188,9 +208,27 @@ function PreviewStep({
       )
     })
 
+  const isEdited = (l: EditableLine, i: number) => FIELDS.some((f) => l[f] !== original[i][f])
+  const errorOf = (l: EditableLine) => {
+    if (!l.date) return 'Date manquante'
+    if (l.description.trim() === '') return 'Description manquante'
+    if (parseAmount(l.amountText) === null) return 'Montant invalide'
+    return null
+  }
+
   const selected = lines.filter((l) => l.selected)
+  const invalid = selected.filter((l) => errorOf(l) !== null).length
+  const edited = lines.filter(isEdited).length
+  const changed = edited > 0 || lines.some((l, i) => l.selected !== original[i].selected)
   const duplicates = lines.filter((l) => l.duplicateOf).length
-  const effect = (l: Line) => (l.direction === 'credit' ? l.amount : -l.amount)
+  const effect = (l: EditableLine) =>
+    (l.direction === 'credit' ? 1 : -1) * (parseAmount(l.amountText) ?? 0)
+  const totalIn = selected
+    .filter((l) => l.direction === 'credit')
+    .reduce((s, l) => s + effect(l), 0)
+  const totalOut = Math.abs(
+    selected.filter((l) => l.direction === 'debit').reduce((s, l) => s + effect(l), 0)
+  )
 
   // Solde de l'app à la fin du relevé une fois l'import fait, comparé au relevé
   const after =
@@ -201,19 +239,20 @@ function PreviewStep({
     after === null || preview.closingBalance === null ? null : after - preview.closingBalance
 
   function submit() {
+    if (!confirm(`Importer ${selected.length} opération(s) dans « ${account?.name} » ?`)) return
     setProcessing(true)
     router.post(
       '/imports',
       {
         accountId: preview.accountId,
-        lines: selected.map(({ date, label, amount, direction, description, note, target }) => ({
-          date,
-          label,
-          amount,
-          direction,
-          description,
-          note,
-          target,
+        lines: selected.map((l) => ({
+          date: l.date,
+          label: l.label,
+          amount: parseAmount(l.amountText)!,
+          direction: l.direction,
+          description: l.description.trim(),
+          note: l.noteText.trim() === '' ? null : l.noteText.trim(),
+          target: l.target,
         })),
         learn: lines
           .filter((l) => l.duplicateOf)
@@ -223,16 +262,43 @@ function PreviewStep({
     )
   }
 
+  // Ce qu'affiche la ligne pour sa catégorie ou son virement
+  function targetOf(l: EditableLine) {
+    const [kind, id] = l.target.split(':')
+    if (kind === 'cat') {
+      const c = categories.find((x) => x.id === Number(id))
+      return c ? { label: c.name, color: c.color } : null
+    }
+    if (kind === 'acc') {
+      const a = accounts.find((x) => x.id === Number(id))
+      return a
+        ? { label: `${l.direction === 'debit' ? 'Vers' : 'Depuis'} ${a.name}`, color: null }
+        : null
+    }
+    return null
+  }
+
+  const restore = (index: number) =>
+    setLines((prev) =>
+      prev.map((l, i) => (i === index ? { ...original[i], selected: l.selected } : l))
+    )
+
+  function cancel() {
+    if (changed && !confirm('Annuler l’import ? Tes modifications seront perdues.')) return
+    router.visit('/imports')
+  }
+
   return (
     <div className="b-import">
-      <section className="panel b-import__summary">
+      <section className="panel b-review__summary">
         <div>
-          <h2 className="section__title">{preview.fileName}</h2>
+          <h2 className="section__title">Vérifie les opérations avant de valider</h2>
           <p className="section__description">
             {account?.name}
             {preview.from && preview.to
               ? ` · du ${longDate(preview.from)} au ${longDate(preview.to)}`
-              : ''}
+              : ''}{' '}
+            · {preview.fileName}
           </p>
         </div>
 
@@ -274,112 +340,246 @@ function PreviewStep({
         </ul>
       </section>
 
-      <section className="panel">
-        <div className="b-table-wrap">
-          <table className="b-table b-import__table">
-            <thead>
-              <tr>
-                <th>
+      <section className="panel b-review">
+        <header className="b-review__head">
+          <label className="b-review__all">
+            <input
+              type="checkbox"
+              checked={selected.length === lines.length}
+              onChange={(e) =>
+                setLines((prev) => prev.map((l) => ({ ...l, selected: e.target.checked })))
+              }
+            />
+            Tout cocher
+          </label>
+          <span className="b-review__tip">Clique sur une opération pour la modifier.</span>
+        </header>
+
+        <ul className="b-review__list">
+          {lines.map((l, i) => {
+            const error = l.selected ? errorOf(l) : null
+            const target = targetOf(l)
+            const amount = parseAmount(l.amountText)
+            const isOpen = open === i
+            return (
+              <li
+                key={i}
+                className={[
+                  'b-review__item',
+                  l.selected ? '' : 'is-off',
+                  isOpen ? 'is-open' : '',
+                ].join(' ')}
+              >
+                <div className="b-review__row">
                   <input
                     type="checkbox"
-                    aria-label="Tout cocher"
-                    checked={selected.length === lines.length}
-                    onChange={(e) =>
-                      setLines((prev) => prev.map((l) => ({ ...l, selected: e.target.checked })))
-                    }
+                    className="b-review__check"
+                    aria-label={`Importer « ${l.description} »`}
+                    checked={l.selected}
+                    onChange={(e) => update(i, { selected: e.target.checked })}
                   />
-                </th>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Catégorie</th>
-                <th className="b-num">Montant</th>
-              </tr>
-            </thead>
-            <tbody>
-              {lines.map((l, i) => (
-                <tr key={i} className={l.selected ? '' : 'b-import__off'}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      aria-label={`Importer « ${l.description} »`}
-                      checked={l.selected}
-                      onChange={(e) => update(i, { selected: e.target.checked })}
-                    />
-                  </td>
-                  <td className="b-item__meta" style={{ whiteSpace: 'nowrap' }}>
-                    {shortDate(l.date)}
-                  </td>
-                  <td>
-                    <input
-                      className="field__input b-input-sm"
-                      aria-label="Description"
-                      value={l.description}
-                      onChange={(e) => updateSimilar(i, 'description', e.target.value)}
-                    />
-                    <div className="b-import__label" title={l.label}>
-                      {l.duplicateOf
-                        ? `Déjà dans l’app : « ${l.duplicateOf.description} »`
-                        : l.label}
-                      {l.note ? ` · ${l.note}` : ''}
-                    </div>
-                  </td>
-                  <td>
-                    <select
-                      className="field__input b-input-sm"
-                      aria-label="Catégorie"
-                      value={l.target}
-                      onChange={(e) => updateSimilar(i, 'target', e.target.value)}
-                    >
-                      <option value="">Aucune</option>
-                      <optgroup label="Catégories">
-                        {categories.map((c) => (
-                          <option key={c.id} value={`cat:${c.id}`}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </optgroup>
-                      {otherAccounts.length > 0 && (
-                        <optgroup
-                          label={l.direction === 'debit' ? 'Virement vers' : 'Virement depuis'}
-                        >
-                          {otherAccounts.map((a) => (
-                            <option key={a.id} value={`acc:${a.id}`}>
-                              {a.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      )}
-                    </select>
-                  </td>
-                  <td
-                    className={`b-num b-amount ${l.direction === 'credit' ? 'b-amount--in' : 'b-amount--out'}`}
+                  <button
+                    type="button"
+                    className="b-review__main"
+                    aria-expanded={isOpen}
+                    onClick={() => setOpen(isOpen ? null : i)}
                   >
-                    {l.direction === 'credit' ? '+' : '−'} {euros(l.amount)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <span className="b-review__date">{shortDate(l.date)}</span>
+                    <span className="b-review__text">
+                      <span className="b-review__title">
+                        {l.description || <em>Sans description</em>}
+                      </span>
+                      <span className="b-review__meta">
+                        {target ? (
+                          <span className="b-review__cat">
+                            {target.color !== undefined && (
+                              <span
+                                className="b-dot"
+                                style={{ background: target.color ?? 'var(--subtle)' }}
+                              />
+                            )}
+                            {target.label}
+                          </span>
+                        ) : (
+                          <span className="b-review__cat is-empty">Sans catégorie</span>
+                        )}
+                        {l.duplicateOf && <span className="b-badge">Déjà dans l’app</span>}
+                        {isEdited(l, i) && <span className="b-badge b-badge--ink">Modifié</span>}
+                        {error && <span className="b-badge b-badge--out">{error}</span>}
+                      </span>
+                    </span>
+                    <span
+                      className={`b-review__amount ${l.direction === 'credit' ? 'b-amount--in' : 'b-amount--out'}`}
+                    >
+                      {l.direction === 'credit' ? '+' : '−'} {amount === null ? '—' : euros(amount)}
+                    </span>
+                    <ChevronDown size={16} className="b-review__chevron" aria-hidden="true" />
+                  </button>
+                </div>
 
-        <div className="b-row b-import__actions">
+                {isOpen && (
+                  <div className="b-review__edit">
+                    <p className="b-review__source">Sur le relevé : {l.label}</p>
+                    <div className="b-review__fields">
+                      <div className="field b-review__wide">
+                        <label className="field__label" htmlFor={`e-desc-${i}`}>
+                          Description
+                        </label>
+                        <input
+                          id={`e-desc-${i}`}
+                          className="field__input"
+                          value={l.description}
+                          autoFocus
+                          onChange={(e) => updateSimilar(i, 'description', e.target.value)}
+                        />
+                      </div>
+                      <div className="field">
+                        <label className="field__label" htmlFor={`e-cat-${i}`}>
+                          Catégorie
+                        </label>
+                        <select
+                          id={`e-cat-${i}`}
+                          className="field__input"
+                          value={l.target}
+                          onChange={(e) => updateSimilar(i, 'target', e.target.value)}
+                        >
+                          <option value="">Aucune</option>
+                          <optgroup label="Catégories">
+                            {categories.map((c) => (
+                              <option key={c.id} value={`cat:${c.id}`}>
+                                {c.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          {otherAccounts.length > 0 && (
+                            <optgroup
+                              label={l.direction === 'debit' ? 'Virement vers' : 'Virement depuis'}
+                            >
+                              {otherAccounts.map((a) => (
+                                <option key={a.id} value={`acc:${a.id}`}>
+                                  {a.name}
+                                </option>
+                              ))}
+                            </optgroup>
+                          )}
+                        </select>
+                      </div>
+                      <div className="field">
+                        <label className="field__label" htmlFor={`e-date-${i}`}>
+                          Date
+                        </label>
+                        <input
+                          id={`e-date-${i}`}
+                          type="date"
+                          className="field__input"
+                          value={l.date}
+                          onChange={(e) => update(i, { date: e.target.value })}
+                        />
+                      </div>
+                      <div className="field">
+                        <span className="field__label">Type</span>
+                        <div className="b-toggle">
+                          <button
+                            type="button"
+                            aria-pressed={l.direction === 'debit'}
+                            onClick={() => update(i, { direction: 'debit' })}
+                          >
+                            Dépense
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={l.direction === 'credit'}
+                            onClick={() => update(i, { direction: 'credit' })}
+                          >
+                            Revenu
+                          </button>
+                        </div>
+                      </div>
+                      <div className="field">
+                        <label className="field__label" htmlFor={`e-amount-${i}`}>
+                          Montant (€)
+                        </label>
+                        <input
+                          id={`e-amount-${i}`}
+                          className="field__input"
+                          inputMode="decimal"
+                          aria-invalid={amount === null ? 'true' : 'false'}
+                          value={l.amountText}
+                          onChange={(e) => update(i, { amountText: e.target.value })}
+                        />
+                      </div>
+                      <div className="field b-review__wide">
+                        <label className="field__label" htmlFor={`e-note-${i}`}>
+                          Note
+                        </label>
+                        <input
+                          id={`e-note-${i}`}
+                          className="field__input"
+                          placeholder="Facultatif"
+                          value={l.noteText}
+                          onChange={(e) => update(i, { noteText: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <div className="b-row b-review__actions">
+                      <button
+                        type="button"
+                        className="btn btn--secondary btn--sm"
+                        onClick={() => setOpen(null)}
+                      >
+                        Fermer
+                      </button>
+                      {isEdited(l, i) && (
+                        <button type="button" className="b-link" onClick={() => restore(i)}>
+                          Rétablir les valeurs du relevé
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+
+      {/* Toujours visible en bas de l'écran */}
+      <div className="b-import__bar">
+        <p className="b-import__totals">
+          <strong>{selected.length}</strong> à importer ·{' '}
+          <span className="b-amount--in">+ {euros(totalIn)}</span> ·{' '}
+          <span className="b-amount--out">− {euros(totalOut)}</span>
+          {edited > 0 && (
+            <>
+              {' '}
+              · {edited} modifiée(s) ·{' '}
+              <button type="button" className="b-link" onClick={() => setLines(original)}>
+                Tout rétablir
+              </button>
+            </>
+          )}
+        </p>
+        <div className="b-row">
+          <button type="button" className="btn btn--secondary" onClick={cancel}>
+            Annuler
+          </button>
           <button
             type="button"
             className="btn btn--primary"
-            disabled={selected.length === 0 || processing}
+            disabled={selected.length === 0 || invalid > 0 || processing}
+            title={invalid > 0 ? 'Corrige les lignes signalées' : undefined}
             onClick={submit}
           >
-            {selected.length === 0
-              ? 'Aucune opération à importer'
-              : selected.length === 1
-                ? 'Importer 1 opération'
-                : `Importer ${selected.length} opérations`}
+            {processing
+              ? 'Import…'
+              : invalid > 0
+                ? `${invalid} ligne(s) à corriger`
+                : selected.length === 0
+                  ? 'Aucune opération à importer'
+                  : `Valider l’import (${selected.length})`}
           </button>
-          <Link href="/imports" className="btn btn--secondary">
-            Changer de relevé
-          </Link>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

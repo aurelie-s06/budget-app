@@ -190,7 +190,7 @@ export default function SettingsShow({ profile, stats }: Props) {
                     : 'Aucune opération pour l’instant.'}
                 </p>
               </div>
-              <dl className="b-stats">
+              <dl className="b-counts">
                 <div>
                   <dt>Opérations</dt>
                   <dd>{stats.transactions}</dd>
