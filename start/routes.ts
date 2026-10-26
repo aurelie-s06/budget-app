@@ -81,6 +81,7 @@ router
       .put('settings/password', [controllers.Settings, 'updatePassword'])
       .as('settings.password')
     router.get('settings/export', [controllers.Settings, 'export']).as('settings.export')
+    router.post('settings/backup', [controllers.Settings, 'backup']).as('settings.backup')
     router.delete('settings', [controllers.Settings, 'destroy']).as('settings.destroy')
   })
   .use([middleware.auth(), middleware.recurring()])

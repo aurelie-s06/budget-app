@@ -57,6 +57,7 @@ export interface ApiDefinition {
     profile: typeof routes['settings.profile']
     password: typeof routes['settings.password']
     export: typeof routes['settings.export']
+    backup: typeof routes['settings.backup']
     destroy: typeof routes['settings.destroy']
   }
 }

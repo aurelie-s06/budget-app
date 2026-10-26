@@ -2562,3 +2562,12 @@ form.b-import {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Sauvegardes (profil) */
+.b-counts dd.b-counts__text {
+  font-size: 15px;
+}
+.b-settings__folder {
+  margin-top: 0;
+  overflow-wrap: anywhere;
+}

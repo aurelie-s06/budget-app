@@ -1,5 +1,6 @@
-import { Head, useForm } from '@inertiajs/react'
-import { Download } from 'lucide-react'
+import { Head, router, useForm } from '@inertiajs/react'
+import { useState } from 'react'
+import { DatabaseBackup, Download } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 
@@ -13,6 +14,13 @@ type Props = {
     // Date de la plus ancienne opération
     firstDate: string | null
   }
+  backups: {
+    // « iCloud Drive › Mon Budget › Sauvegardes »
+    folder: string
+    count: number
+    // Date de la plus récente (ISO), null si aucune
+    last: string | null
+  }
 }
 
 const longDate = (iso: string) =>
@@ -22,7 +30,20 @@ const longDate = (iso: string) =>
     year: 'numeric',
   })
 
-export default function SettingsShow({ profile, stats }: Props) {
+// « aujourd’hui à 12:05 », « hier à 09:00 », « le 3 octobre à 18:20 »
+function when(iso: string) {
+  const date = new Date(iso)
+  const days = Math.round(
+    (new Date().setHours(0, 0, 0, 0) - new Date(iso).setHours(0, 0, 0, 0)) / 86_400_000
+  )
+  const time = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  if (days === 0) return `aujourd’hui à ${time}`
+  if (days === 1) return `hier à ${time}`
+  return `le ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} à ${time}`
+}
+
+export default function SettingsShow({ profile, stats, backups }: Props) {
+  const [backingUp, setBackingUp] = useState(false)
   const profileForm = useForm({ fullName: profile.fullName ?? '', email: profile.email })
   const passwordForm = useForm({ currentPassword: '', password: '', passwordConfirmation: '' })
   const deleteForm = useForm({ currentPassword: '' })
@@ -210,6 +231,51 @@ export default function SettingsShow({ profile, stats }: Props) {
                   <Download size={16} aria-hidden="true" />
                   Exporter mes opérations (CSV)
                 </a>
+              </div>
+            </section>
+
+            {/* Sauvegardes */}
+            <section className="panel">
+              <div className="b-settings__head">
+                <h2 className="section__title">Sauvegardes</h2>
+                <p className="section__description">
+                  Une copie complète de l’app est faite chaque jour, et les 15 dernières sont
+                  gardées.
+                </p>
+              </div>
+              <dl className="b-counts">
+                <div>
+                  <dt>Dernière sauvegarde</dt>
+                  <dd className="b-counts__text">
+                    {backups.last ? when(backups.last) : 'Aucune pour l’instant'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Sauvegardes gardées</dt>
+                  <dd>{backups.count}</dd>
+                </div>
+              </dl>
+              <p className="b-form__hint b-settings__folder">Dossier : {backups.folder}</p>
+              <div className="b-row">
+                <button
+                  type="button"
+                  className="btn btn--secondary"
+                  disabled={backingUp}
+                  onClick={() =>
+                    router.post(
+                      '/settings/backup',
+                      {},
+                      {
+                        preserveScroll: true,
+                        onStart: () => setBackingUp(true),
+                        onFinish: () => setBackingUp(false),
+                      }
+                    )
+                  }
+                >
+                  <DatabaseBackup size={16} aria-hidden="true" />
+                  {backingUp ? 'Sauvegarde…' : 'Sauvegarder maintenant'}
+                </button>
               </div>
             </section>
 

@@ -117,6 +117,7 @@ Pour arrêter le serveur : `Ctrl + C` dans le terminal.
 | `npm run format` | Formate le code avec Prettier |
 | `npm run build` puis `npm start` | Version de production (lancée depuis le dossier `build/`, avec son propre `.env`) |
 | `node ace migration:rollback` | Annule la dernière migration |
+| `node ace backup:create` | Sauvegarde la base de données |
 
 ### Optionnel : démarrage automatique sous macOS
 
@@ -143,6 +144,29 @@ Mon Budget peut s'installer comme une application, avec sa propre icône et sa p
 - **iPhone (Safari)** : Partager › Sur l'écran d'accueil.
 
 Le serveur doit tourner pour que l'application fonctionne (le démarrage automatique ci-dessus s'en charge).
+
+## Sauvegardes
+
+Toutes les données tiennent dans un seul fichier, `tmp/db.sqlite3`, qui n'est pas versionné. L'application en fait donc une copie complète :
+
+- **automatiquement**, une fois par jour, au démarrage du serveur puis à chaque heure si celle du jour manque ;
+- **à la demande**, avec le bouton « Sauvegarder maintenant » de la page Mon profil, ou la commande `node ace backup:create`.
+
+Les copies vont dans **iCloud Drive › Mon Budget › Sauvegardes** (ou `~/Documents/Mon Budget/Sauvegardes` sans iCloud). Les 15 plus récentes sont gardées. Pour choisir un autre dossier, définir `BACKUP_DIR` dans `.env`.
+
+### Restaurer une sauvegarde
+
+```bash
+# 1. Arrêter le serveur (Ctrl + C, ou pour le démarrage automatique :)
+launchctl bootout "gui/$(id -u)/com.monbudget.server"
+
+# 2. Garder la base actuelle de côté, puis la remplacer par la sauvegarde choisie
+mv tmp/db.sqlite3 tmp/db.sqlite3.avant-restauration
+cp ~/Library/Mobile\ Documents/com~apple~CloudDocs/Mon\ Budget/Sauvegardes/mon-budget-AAAA-MM-JJ_HH-MM-SS.sqlite3 tmp/db.sqlite3
+
+# 3. Relancer (npm run dev, ou pour le démarrage automatique :)
+bash scripts/autostart/install.sh
+```
 
 ## Structure des données
 

@@ -38,6 +38,7 @@ export type ScannedRoutes = {
     'settings.profile': { paramsTuple?: []; params?: {} }
     'settings.password': { paramsTuple?: []; params?: {} }
     'settings.export': { paramsTuple?: []; params?: {} }
+    'settings.backup': { paramsTuple?: []; params?: {} }
     'settings.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -80,6 +81,7 @@ export type ScannedRoutes = {
     'recurring.store': { paramsTuple?: []; params?: {} }
     'imports.preview': { paramsTuple?: []; params?: {} }
     'imports.store': { paramsTuple?: []; params?: {} }
+    'settings.backup': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'categories.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

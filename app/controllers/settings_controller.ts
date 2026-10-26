@@ -3,6 +3,7 @@ import hash from '@adonisjs/core/services/hash'
 import { errors } from '@vinejs/vine'
 import { DateTime } from 'luxon'
 import type User from '#models/user'
+import { createBackup, listBackups, readableDir } from '#services/backup_service'
 import { deleteAccountValidator, passwordValidator, profileValidator } from '#validators/settings'
 
 // Mot de passe actuel faux : erreur affichée sous le champ, comme une erreur de validation
@@ -44,6 +45,7 @@ export default class SettingsController {
         transactions: await count('transactions'),
         firstDate: first?.date.toISODate() ?? null,
       },
+      backups: await this.backups(),
     })
   }
 
@@ -65,6 +67,26 @@ export default class SettingsController {
     await user.save()
     session.flash('success', 'Mot de passe modifié')
     return response.redirect().back()
+  }
+
+  // Sauvegarde immédiate de toute la base
+  async backup({ response, session }: HttpContext) {
+    try {
+      await createBackup()
+      session.flash('success', 'Sauvegarde créée')
+    } catch {
+      session.flash('error', `Impossible d’écrire dans ${readableDir()}`)
+    }
+    return response.redirect().back()
+  }
+
+  private async backups() {
+    const backups = await listBackups()
+    return {
+      folder: readableDir(),
+      count: backups.length,
+      last: backups[0]?.createdAt.toISO() ?? null,
+    }
   }
 
   // Toutes les opérations en CSV, lisible directement dans Excel ou Numbers

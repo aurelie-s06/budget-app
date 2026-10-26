@@ -210,6 +210,12 @@ const routes = {
     tokens: [[0,"settings"],[0,"export"]],
     types: placeholder as Registry['settings.export']['types'],
   },
+  'settings.backup': {
+    methods: ["POST"],
+    pattern: '/settings/backup',
+    tokens: [[0,"settings"],[0,"backup"]],
+    types: placeholder as Registry['settings.backup']['types'],
+  },
   'settings.destroy': {
     methods: ["DELETE"],
     pattern: '/settings',

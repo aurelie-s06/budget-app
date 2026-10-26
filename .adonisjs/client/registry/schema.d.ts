@@ -449,6 +449,19 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['export']>>>
     }
   }
+  'settings.backup': {
+    methods: ["POST"]
+    pattern: '/settings/backup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['backup']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['backup']>>>
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['backup']>>>
+    }
+  }
   'settings.destroy': {
     methods: ["DELETE"]
     pattern: '/settings'

@@ -24,4 +24,7 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+
+  // Sauvegardes (par défaut : iCloud Drive › Mon Budget › Sauvegardes)
+  BACKUP_DIR: Env.schema.string.optional(),
 })
