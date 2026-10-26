@@ -16,4 +16,5 @@ export const controllers = {
   Years: () => import('#controllers/years_controller'),
   Settings: () => import('#controllers/settings_controller'),
   Imports: () => import('#controllers/imports_controller'),
+  Triage: () => import('#controllers/triage_controller'),
 }

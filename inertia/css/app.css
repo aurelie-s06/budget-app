@@ -2571,3 +2571,260 @@ form.b-import {
   margin-top: 0;
   overflow-wrap: anywhere;
 }
+
+/* ==========================================================================
+   À classer
+   ========================================================================== */
+.b-segment__count {
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+  color: var(--subtle);
+}
+.b-segment button[aria-pressed='true'] .b-segment__count {
+  color: var(--muted);
+}
+.b-triage__card {
+  display: grid;
+  gap: 22px;
+}
+.b-triage__progress {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--subtle);
+}
+.b-triage__op {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.b-triage__op > div {
+  flex: 1;
+  min-width: 0;
+}
+.b-triage__date {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.b-triage__date::first-letter {
+  text-transform: uppercase;
+}
+/* Le nom se modifie sur place, sans allure de formulaire */
+.b-triage__name {
+  width: 100%;
+  margin: 0 -8px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 26px;
+  line-height: 1.25;
+}
+.b-triage__name:hover {
+  border-color: var(--line-2);
+}
+.b-triage__name:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--ring);
+  background: var(--field);
+}
+.b-triage__source {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--subtle);
+  overflow-wrap: anywhere;
+}
+.b-triage__amount {
+  flex: none;
+  margin: 26px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.b-triage__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.b-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 99px;
+  background: var(--card);
+  font-size: 14px;
+  color: var(--ink);
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    scale 0.1s;
+}
+.b-chip:hover:not(:disabled) {
+  border-color: var(--ink);
+  background: var(--paper);
+}
+.b-chip:active:not(:disabled) {
+  scale: 0.97;
+}
+.b-chip:disabled {
+  opacity: 0.5;
+}
+.b-chip .b-dot {
+  width: 9px;
+  height: 9px;
+}
+.b-chip kbd,
+.b-triage__actions kbd {
+  min-width: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--subtle);
+  text-align: center;
+}
+.b-chip--add {
+  border-style: dashed;
+  color: var(--muted);
+}
+.b-chip--form {
+  padding-right: 6px;
+}
+.b-chip--form input {
+  width: 140px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+}
+.b-chip--form input:focus {
+  outline: none;
+}
+.b-triage__similar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--paper);
+  border-radius: var(--r);
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.b-triage__similar input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--ink);
+}
+.b-triage__actions {
+  align-items: center;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.b-triage__actions .btn {
+  gap: 10px;
+}
+.b-triage__queue ul {
+  display: grid;
+  gap: 2px;
+  margin: 12px -8px 0;
+  padding: 0;
+  list-style: none;
+}
+.b-triage__queue button {
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: 8px;
+  border-radius: var(--r);
+  text-align: left;
+}
+.b-triage__queue button:hover {
+  background: var(--paper);
+}
+.b-triage__queue button[aria-current] {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+.b-triage__qname {
+  overflow: hidden;
+  font-size: 13.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.b-triage__qmeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+.b-triage__more {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--subtle);
+}
+.b-triage__done {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+}
+.b-triage__done > svg {
+  color: var(--in);
+}
+.b-triage__done .b-row {
+  margin-top: 12px;
+}
+
+@media (max-width: 880px) {
+  /* Sur petit écran, la file passe sous la carte et se raccourcit */
+  .b-triage__queue ul li:nth-child(n + 6) {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .b-triage__op {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .b-triage__amount {
+    margin: 0;
+  }
+  .b-triage__name {
+    font-size: 22px;
+  }
+  .b-chip kbd,
+  .b-triage__actions kbd {
+    display: none;
+  }
+  .page__header .page__actions:has(.b-segment),
+  .page__header .b-segment {
+    width: 100%;
+  }
+  .page__header .b-segment button {
+    flex: 1;
+  }
+}
+/* Petit compteur dans un bouton : « À classer 42 » */
+.b-count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: var(--ink);
+  color: var(--card);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

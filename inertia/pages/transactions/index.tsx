@@ -3,7 +3,7 @@ import { Link } from '@adonisjs/inertia/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
-import { ArrowDown, ArrowUp, ArrowUpDown, FileUp, Repeat } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, FileUp, Repeat, Tags } from 'lucide-react'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
 
 type Transaction = EditableTransaction & {
@@ -31,6 +31,8 @@ type Props = {
   accounts: (Option & { type: string })[]
   categories: Option[]
   months: string[]
+  // Dépenses dans « Autres » ou sans catégorie
+  toTriage: number
   filters: Filters
 }
 
@@ -62,6 +64,7 @@ export default function TransactionsIndex({
   categories,
   months,
   filters,
+  toTriage,
 }: Props) {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [filterValues, setFilterValues] = useState<Filters>(filters)
@@ -73,6 +76,12 @@ export default function TransactionsIndex({
         <p className="page__description">Tes revenus, dépenses et virements, compte par compte.</p>
       </div>
       <div className="page__actions">
+        {toTriage > 0 && (
+          <Link href="/triage" className="btn btn--secondary">
+            <Tags size={16} aria-hidden="true" />À classer
+            <span className="b-count">{toTriage}</span>
+          </Link>
+        )}
         <Link href="/imports" className="btn btn--secondary">
           <FileUp size={16} aria-hidden="true" />
           Importer un relevé

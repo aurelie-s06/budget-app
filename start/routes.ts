@@ -67,6 +67,10 @@ router
       .delete('recurring/:id', [controllers.RecurringTransactions, 'destroy'])
       .as('recurring.destroy')
 
+    // Classement rapide des opérations « Autres » ou sans catégorie
+    router.get('triage', [controllers.Triage, 'index']).as('triage.index')
+    router.post('triage', [controllers.Triage, 'update']).as('triage.update')
+
     // Import d'un relevé bancaire
     router.get('imports', [controllers.Imports, 'index']).as('imports.index')
     router.post('imports/preview', [controllers.Imports, 'preview']).as('imports.preview')

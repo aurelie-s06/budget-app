@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import { checkOwnership, cleanup } from '#services/ownership_service'
+import { triageCount } from '#services/triage_service'
 import { transactionValidator, transactionFiltersValidator } from '#validators/transaction'
 
 export default class TransactionsController {
@@ -56,6 +57,7 @@ export default class TransactionsController {
 
     // Mois ayant au moins une opération, pour la liste déroulante du filtre
     const dates = await user.related('transactions').query().select('date').orderBy('date', 'desc')
+    const counts = await triageCount(user)
     const months = [...new Set(dates.map((t) => t.date.toFormat('yyyy-MM')))]
 
     return inertia.render('transactions/index', {
@@ -78,6 +80,8 @@ export default class TransactionsController {
       accounts: accounts.map((a) => ({ id: a.id, name: a.name, type: a.type })),
       categories: categories.map((c) => ({ id: c.id, name: c.name })),
       months,
+      // Dépenses à classer, pour le bouton « À classer »
+      toTriage: counts.expense,
       filters: {
         month: filters.month ?? '',
         day: filters.day ?? '',

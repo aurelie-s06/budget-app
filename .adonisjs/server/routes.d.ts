@@ -31,6 +31,8 @@ export type ScannedRoutes = {
     'recurring.store': { paramsTuple?: []; params?: {} }
     'recurring.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'triage.index': { paramsTuple?: []; params?: {} }
+    'triage.update': { paramsTuple?: []; params?: {} }
     'imports.index': { paramsTuple?: []; params?: {} }
     'imports.preview': { paramsTuple?: []; params?: {} }
     'imports.store': { paramsTuple?: []; params?: {} }
@@ -52,6 +54,7 @@ export type ScannedRoutes = {
     'accounts.index': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
     'recurring.index': { paramsTuple?: []; params?: {} }
+    'triage.index': { paramsTuple?: []; params?: {} }
     'imports.index': { paramsTuple?: []; params?: {} }
     'settings.show': { paramsTuple?: []; params?: {} }
     'settings.export': { paramsTuple?: []; params?: {} }
@@ -67,6 +70,7 @@ export type ScannedRoutes = {
     'accounts.index': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
     'recurring.index': { paramsTuple?: []; params?: {} }
+    'triage.index': { paramsTuple?: []; params?: {} }
     'imports.index': { paramsTuple?: []; params?: {} }
     'settings.show': { paramsTuple?: []; params?: {} }
     'settings.export': { paramsTuple?: []; params?: {} }
@@ -79,6 +83,7 @@ export type ScannedRoutes = {
     'accounts.store': { paramsTuple?: []; params?: {} }
     'transactions.store': { paramsTuple?: []; params?: {} }
     'recurring.store': { paramsTuple?: []; params?: {} }
+    'triage.update': { paramsTuple?: []; params?: {} }
     'imports.preview': { paramsTuple?: []; params?: {} }
     'imports.store': { paramsTuple?: []; params?: {} }
     'settings.backup': { paramsTuple?: []; params?: {} }

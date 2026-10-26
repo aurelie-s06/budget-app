@@ -358,6 +358,32 @@ export interface Registry {
       rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/recurring_transactions_controller').default['destroy']>>>
     }
   }
+  'triage.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/triage'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/triage').triageFiltersValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/triage_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/triage_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/triage_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'triage.update': {
+    methods: ["POST"]
+    pattern: '/triage'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/triage').triageValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/triage').triageValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/triage_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/triage_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+      rawResponse: ExtractRawResponse<Awaited<ReturnType<import('#controllers/triage_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'imports.index': {
     methods: ["GET","HEAD"]
     pattern: '/imports'

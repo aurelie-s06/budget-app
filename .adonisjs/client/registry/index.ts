@@ -168,6 +168,18 @@ const routes = {
     tokens: [[0,"recurring"],[1,"id"]],
     types: placeholder as Registry['recurring.destroy']['types'],
   },
+  'triage.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/triage',
+    tokens: [[0,"triage"]],
+    types: placeholder as Registry['triage.index']['types'],
+  },
+  'triage.update': {
+    methods: ["POST"],
+    pattern: '/triage',
+    tokens: [[0,"triage"]],
+    types: placeholder as Registry['triage.update']['types'],
+  },
   'imports.index': {
     methods: ["GET","HEAD"],
     pattern: '/imports',

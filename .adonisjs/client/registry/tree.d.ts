@@ -47,6 +47,10 @@ export interface ApiDefinition {
     update: typeof routes['recurring.update']
     destroy: typeof routes['recurring.destroy']
   }
+  triage: {
+    index: typeof routes['triage.index']
+    update: typeof routes['triage.update']
+  }
   imports: {
     index: typeof routes['imports.index']
     preview: typeof routes['imports.preview']
