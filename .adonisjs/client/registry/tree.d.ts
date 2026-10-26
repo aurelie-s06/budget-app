@@ -47,4 +47,16 @@ export interface ApiDefinition {
     update: typeof routes['recurring.update']
     destroy: typeof routes['recurring.destroy']
   }
+  imports: {
+    index: typeof routes['imports.index']
+    preview: typeof routes['imports.preview']
+    store: typeof routes['imports.store']
+  }
+  settings: {
+    show: typeof routes['settings.show']
+    profile: typeof routes['settings.profile']
+    password: typeof routes['settings.password']
+    export: typeof routes['settings.export']
+    destroy: typeof routes['settings.destroy']
+  }
 }

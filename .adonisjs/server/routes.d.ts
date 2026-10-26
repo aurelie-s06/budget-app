@@ -31,6 +31,14 @@ export type ScannedRoutes = {
     'recurring.store': { paramsTuple?: []; params?: {} }
     'recurring.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'imports.index': { paramsTuple?: []; params?: {} }
+    'imports.preview': { paramsTuple?: []; params?: {} }
+    'imports.store': { paramsTuple?: []; params?: {} }
+    'settings.show': { paramsTuple?: []; params?: {} }
+    'settings.profile': { paramsTuple?: []; params?: {} }
+    'settings.password': { paramsTuple?: []; params?: {} }
+    'settings.export': { paramsTuple?: []; params?: {} }
+    'settings.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'home': { paramsTuple?: []; params?: {} }
@@ -43,6 +51,9 @@ export type ScannedRoutes = {
     'accounts.index': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
     'recurring.index': { paramsTuple?: []; params?: {} }
+    'imports.index': { paramsTuple?: []; params?: {} }
+    'settings.show': { paramsTuple?: []; params?: {} }
+    'settings.export': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'home': { paramsTuple?: []; params?: {} }
@@ -55,6 +66,9 @@ export type ScannedRoutes = {
     'accounts.index': { paramsTuple?: []; params?: {} }
     'transactions.index': { paramsTuple?: []; params?: {} }
     'recurring.index': { paramsTuple?: []; params?: {} }
+    'imports.index': { paramsTuple?: []; params?: {} }
+    'settings.show': { paramsTuple?: []; params?: {} }
+    'settings.export': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'new_account.store': { paramsTuple?: []; params?: {} }
@@ -64,6 +78,8 @@ export type ScannedRoutes = {
     'accounts.store': { paramsTuple?: []; params?: {} }
     'transactions.store': { paramsTuple?: []; params?: {} }
     'recurring.store': { paramsTuple?: []; params?: {} }
+    'imports.preview': { paramsTuple?: []; params?: {} }
+    'imports.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'categories.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -71,6 +87,8 @@ export type ScannedRoutes = {
     'savings_goal.update': { paramsTuple?: []; params?: {} }
     'transactions.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.profile': { paramsTuple?: []; params?: {} }
+    'settings.password': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'categories.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -78,6 +96,7 @@ export type ScannedRoutes = {
     'savings_goal.destroy': { paramsTuple?: []; params?: {} }
     'transactions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.destroy': { paramsTuple?: []; params?: {} }
   }
 }
 declare module '@adonisjs/core/types/http' {

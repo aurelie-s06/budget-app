@@ -66,5 +66,21 @@ router
     router
       .delete('recurring/:id', [controllers.RecurringTransactions, 'destroy'])
       .as('recurring.destroy')
+
+    // Import d'un relevé bancaire
+    router.get('imports', [controllers.Imports, 'index']).as('imports.index')
+    router.post('imports/preview', [controllers.Imports, 'preview']).as('imports.preview')
+    // Rechargement de l'aperçu : retour au choix du relevé
+    router.on('imports/preview').redirectToPath('/imports')
+    router.post('imports', [controllers.Imports, 'store']).as('imports.store')
+
+    // Profil
+    router.get('settings', [controllers.Settings, 'show']).as('settings.show')
+    router.put('settings/profile', [controllers.Settings, 'updateProfile']).as('settings.profile')
+    router
+      .put('settings/password', [controllers.Settings, 'updatePassword'])
+      .as('settings.password')
+    router.get('settings/export', [controllers.Settings, 'export']).as('settings.export')
+    router.delete('settings', [controllers.Settings, 'destroy']).as('settings.destroy')
   })
   .use([middleware.auth(), middleware.recurring()])

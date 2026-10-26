@@ -168,6 +168,54 @@ const routes = {
     tokens: [[0,"recurring"],[1,"id"]],
     types: placeholder as Registry['recurring.destroy']['types'],
   },
+  'imports.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/imports',
+    tokens: [[0,"imports"]],
+    types: placeholder as Registry['imports.index']['types'],
+  },
+  'imports.preview': {
+    methods: ["POST"],
+    pattern: '/imports/preview',
+    tokens: [[0,"imports"],[0,"preview"]],
+    types: placeholder as Registry['imports.preview']['types'],
+  },
+  'imports.store': {
+    methods: ["POST"],
+    pattern: '/imports',
+    tokens: [[0,"imports"]],
+    types: placeholder as Registry['imports.store']['types'],
+  },
+  'settings.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings',
+    tokens: [[0,"settings"]],
+    types: placeholder as Registry['settings.show']['types'],
+  },
+  'settings.profile': {
+    methods: ["PUT"],
+    pattern: '/settings/profile',
+    tokens: [[0,"settings"],[0,"profile"]],
+    types: placeholder as Registry['settings.profile']['types'],
+  },
+  'settings.password': {
+    methods: ["PUT"],
+    pattern: '/settings/password',
+    tokens: [[0,"settings"],[0,"password"]],
+    types: placeholder as Registry['settings.password']['types'],
+  },
+  'settings.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/export',
+    tokens: [[0,"settings"],[0,"export"]],
+    types: placeholder as Registry['settings.export']['types'],
+  },
+  'settings.destroy': {
+    methods: ["DELETE"],
+    pattern: '/settings',
+    tokens: [[0,"settings"]],
+    types: placeholder as Registry['settings.destroy']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

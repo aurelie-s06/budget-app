@@ -24,5 +24,7 @@ declare module '@adonisjs/inertia/types' {
     'recurring/index': ExtractProps<(typeof import('../../inertia/pages/recurring/index.tsx'))['default']>
     'transactions/index': ExtractProps<(typeof import('../../inertia/pages/transactions/index.tsx'))['default']>
     'years/show': ExtractProps<(typeof import('../../inertia/pages/years/show.tsx'))['default']>
+    'settings/show': ExtractProps<(typeof import('../../inertia/pages/settings/show.tsx'))['default']>
+    'imports/index': ExtractProps<(typeof import('../../inertia/pages/imports/index.tsx'))['default']>
   }
 }

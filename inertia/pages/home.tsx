@@ -2,6 +2,7 @@ import { Link } from '@adonisjs/inertia/react'
 import Logo from '~/components/logo'
 import Footer from '~/components/footer'
 import ThemeToggle from '~/components/theme_toggle'
+import FlashToasts from '~/components/flash_toasts'
 
 const features = ['Tous tes comptes', 'Budgets par catégorie', 'Graphique des dépenses']
 
@@ -46,6 +47,8 @@ export default function Home() {
       </main>
 
       <Footer />
+      {/* Message après la suppression du compte */}
+      <FlashToasts />
     </div>
   )
 }

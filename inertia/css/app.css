@@ -2124,3 +2124,184 @@ a.b-cal__day:hover {
   vertical-align: -1px;
   color: var(--muted);
 }
+
+/* ==========================================================================
+   Profil
+   ========================================================================== */
+.b-avatar {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.b-avatar[aria-current='page'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
+}
+.b-settings {
+  display: grid;
+  gap: 20px;
+  max-width: 720px;
+}
+.b-settings .panel {
+  display: grid;
+  gap: 16px;
+}
+.b-settings__head .section__description {
+  margin-top: 4px;
+}
+.b-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.b-stats div {
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.b-stats dt {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.b-stats dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.b-danger {
+  border-color: color-mix(in srgb, var(--out) 35%, var(--line-2));
+}
+.btn--danger {
+  background: var(--out);
+  border-color: var(--out);
+  color: #fff;
+}
+.btn--danger:hover {
+  filter: brightness(0.92);
+}
+
+/* ==========================================================================
+   Import d'un relevé
+   ========================================================================== */
+.b-import {
+  display: grid;
+  gap: 20px;
+}
+form.b-import {
+  max-width: 560px;
+}
+.b-drop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 28px 16px;
+  border: 1.5px dashed var(--line-2);
+  border-radius: var(--r);
+  background: var(--paper);
+  color: var(--muted);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.b-drop:hover,
+.b-drop:focus-within {
+  border-color: var(--ink);
+}
+.b-drop[data-filled] {
+  border-style: solid;
+  color: var(--ink);
+}
+.b-drop__title {
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.b-drop__hint {
+  font-size: 12.5px;
+}
+/* Le champ couvre toute la zone : clic et glisser-déposer */
+.b-drop input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.b-import__summary {
+  display: grid;
+  gap: 14px;
+}
+.b-checks {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.b-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.b-check svg {
+  flex: none;
+  margin-top: 1px;
+}
+.b-check--ok svg {
+  color: var(--in);
+}
+.b-check--warn {
+  color: var(--ink);
+}
+.b-check--warn svg {
+  color: var(--out);
+}
+.b-import__table td {
+  vertical-align: top;
+}
+.b-import__table input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin-top: 8px;
+  accent-color: var(--ink);
+}
+.b-input-sm {
+  height: 32px;
+  padding: 0 8px;
+  font-size: 13.5px;
+  min-width: 150px;
+}
+.b-import__table td:nth-child(3) {
+  width: 100%;
+}
+.b-import__table td:nth-child(3) .b-input-sm {
+  width: 100%;
+}
+.b-import__label {
+  max-width: 420px;
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 11.5px;
+  color: var(--subtle);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.b-import__table td.b-amount {
+  padding-top: 14px;
+  white-space: nowrap;
+}
+.b-import__off {
+  opacity: 0.5;
+}
+.b-import__actions {
+  margin-top: 16px;
+}

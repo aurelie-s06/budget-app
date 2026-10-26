@@ -14,4 +14,6 @@ export const controllers = {
   Session: () => import('#controllers/session_controller'),
   Transactions: () => import('#controllers/transactions_controller'),
   Years: () => import('#controllers/years_controller'),
+  Settings: () => import('#controllers/settings_controller'),
+  Imports: () => import('#controllers/imports_controller'),
 }

@@ -104,12 +104,14 @@ export class SavingsGoalSchema extends BaseModel {
 }
 
 export class TransactionSchema extends BaseModel {
-  static $columns = ['accountId', 'amount', 'categoryId', 'createdAt', 'date', 'description', 'id', 'note', 'recurringId', 'toAccountId', 'type', 'updatedAt', 'userId'] as const
+  static $columns = ['accountId', 'amount', 'bankLabel', 'categoryId', 'createdAt', 'date', 'description', 'id', 'note', 'recurringId', 'toAccountId', 'type', 'updatedAt', 'userId'] as const
   $columns = TransactionSchema.$columns
   @column()
   declare accountId: number
   @column()
   declare amount: number
+  @column()
+  declare bankLabel: string | null
   @column()
   declare categoryId: number | null
   @column.dateTime({ autoCreate: true })
