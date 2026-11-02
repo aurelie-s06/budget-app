@@ -264,6 +264,10 @@ tests/unit/      → tests du calcul des échéances récurrentes
 - Les requêtes passent par `user.related(...)` : un utilisateur ne peut ni lire ni modifier les données d'un autre, même en changeant l'identifiant dans l'URL.
 - À chaque création ou modification (opération, récurrence, import, classement), le serveur vérifie que les comptes et catégories choisis appartiennent bien à l'utilisateur.
 - Changer de mot de passe ou supprimer son compte demande le mot de passe actuel.
+- Connexion limitée à 5 essais ratés par email et par IP, puis 15 minutes d'attente (compteur en mémoire).
+- En-têtes : Content-Security-Policy avec nonce, `Referrer-Policy`, `Cache-Control: no-store` sur les pages connectées, CORS fermé.
+- Relevés PDF effacés du dossier temporaire dès leur lecture ; import enregistré en tout ou rien.
+- Export CSV : les valeurs qu'Excel exécuterait comme des formules sont neutralisées.
 - Toutes les données envoyées sont validées avec VineJS ; un relevé importé doit être un PDF de 10 Mo maximum.
 - Le fichier `.env` et la base de données ne sont pas versionnés.
 
@@ -307,3 +311,15 @@ tests/unit/      → tests du calcul des échéances récurrentes
 
 **Ce que j'en retiens**
 L'IA m'a aidée à débloquer des situations complexes sur lesquelles je serais restée bloquée longtemps : comprendre d'où venait une page blanche sans message d'erreur, lire un PDF bancaire, ou résoudre le problème du solde de départ. Elle accélère beaucoup le développement, mais elle ne connaît pas toujours la version exacte des outils utilisés et peut elle-même introduire des erreurs (le conflit de styles en est un exemple). Il faut lire les messages d'erreur, comprendre le code produit et vérifier chaque étape, sinon on accumule des erreurs difficiles à retrouver.
+
+## Accessibilité et qualité
+
+Le projet suit le [référentiel Opquast](https://checklists.opquast.com/fr/qualite-numerique/) (v5, 2025) et vise les niveaux WCAG A et AA :
+
+- Liens d'accès rapide, focus clavier toujours visible, focus déplacé au changement de page et sur le premier champ en erreur.
+- Champs obligatoires marqués, limites et formats indiqués, erreurs reliées à leur champ, messages en français, retour après chaque action.
+- Mot de passe affichable, avec indication de sa solidité.
+- Données chiffrées accessibles sous chaque graphique, tableaux avec titres et en-têtes reliés.
+- Page [Confidentialité](/confidentialite), pages d'erreur 403 et 404 avec le menu, styles d'impression.
+
+Pour le contrôle, axe-core ne relève aucune anomalie sur les pages de l'app, en thème clair et sombre.

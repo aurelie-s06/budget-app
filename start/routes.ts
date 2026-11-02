@@ -10,6 +10,9 @@ import router from '@adonisjs/core/services/router'
 
 router.on('/').renderInertia('home', {}).as('home')
 
+// Confidentialité et informations légales, accessibles à tous
+router.on('confidentialite').renderInertia('legal/privacy', {}).as('privacy')
+
 // Pages accessibles uniquement aux visiteurs non connectés
 router
   .group(() => {

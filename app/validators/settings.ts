@@ -10,7 +10,7 @@ const messages = new SimpleMessagesProvider({
   'sameAs': 'Les deux mots de passe ne correspondent pas',
 })
 
-const password = () => vine.string().minLength(8).maxLength(32)
+const password = () => vine.string().minLength(8).maxLength(128)
 
 // Profil : l'email doit rester unique, sauf pour l'utilisateur lui-même
 export const profileValidator = vine.withMetaData<{ userId: number }>().create({
@@ -19,6 +19,7 @@ export const profileValidator = vine.withMetaData<{ userId: number }>().create({
     .string()
     .trim()
     .email()
+    .toLowerCase()
     .maxLength(254)
     .unique({
       table: 'users',

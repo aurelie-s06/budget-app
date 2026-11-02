@@ -1,30 +1,14 @@
-import { Head } from '@inertiajs/react'
-import Footer from '~/components/footer'
+import ErrorPage from '~/components/error_page'
 
 export default function ServerError() {
   return (
-    <div className="b-landing">
-      <Head title="Erreur" />
-      <main className="home">
-        <article className="prose-card">
-          <div className="pc-top">
-            <span className="pc-status mono tag" style={{ color: 'var(--out)' }}>
-              <span className="dot" /> 500
-            </span>
-          </div>
-          <div className="pc-lead">
-            <span>Une erreur est survenue.</span>
-            <em>Le serveur n&apos;a pas pu traiter la demande.</em>
-          </div>
-          <p className="pc-para">
-            Réessaie dans un instant. Si le problème persiste, consulte les logs du serveur.
-          </p>
-          <a href="/" className="btn btn--primary pc-action">
-            Retour à l&apos;accueil
-          </a>
-        </article>
-      </main>
-      <Footer />
-    </div>
+    <ErrorPage
+      code={500}
+      title="Une erreur est survenue"
+      lead="Le serveur n’a pas pu traiter la demande."
+    >
+      Tes données n’ont pas été perdues. Réessaie dans un instant ; si le problème continue,
+      recharge la page plus tard.
+    </ErrorPage>
   )
 }

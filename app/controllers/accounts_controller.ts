@@ -29,26 +29,29 @@ export default class AccountsController {
     })
   }
 
-  async store({ auth, request, response }: HttpContext) {
+  async store({ auth, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const data = await request.validateUsing(accountValidator)
     await user.related('accounts').create(withDate(data))
+    session.flash('success', 'Compte ajouté')
     return response.redirect().back()
   }
 
-  async update({ auth, params, request, response }: HttpContext) {
+  async update({ auth, params, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const account = await user.related('accounts').query().where('id', params.id).firstOrFail()
     const data = await request.validateUsing(accountValidator)
     account.merge(withDate(data))
     await account.save()
+    session.flash('success', 'Compte modifié')
     return response.redirect().back()
   }
 
-  async destroy({ auth, params, response }: HttpContext) {
+  async destroy({ auth, params, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const account = await user.related('accounts').query().where('id', params.id).firstOrFail()
     await account.delete()
+    session.flash('success', 'Compte supprimé')
     return response.redirect().back()
   }
 }

@@ -3,8 +3,8 @@ import vine from '@vinejs/vine'
 /**
  * Shared rules for email and password.
  */
-const email = () => vine.string().email().maxLength(254)
-const password = () => vine.string().minLength(8).maxLength(32)
+const email = () => vine.string().trim().email().toLowerCase().maxLength(254)
+const password = () => vine.string().minLength(8).maxLength(128)
 
 /**
  * Validator to use when performing self-signup.
@@ -14,7 +14,7 @@ const password = () => vine.string().minLength(8).maxLength(32)
  * has no way to know about the errors reported for this field.
  */
 export const signupValidator = vine.create({
-  fullName: vine.string().nullable(),
+  fullName: vine.string().trim().maxLength(100).nullable(),
   email: email().unique({ table: 'users', column: 'email' }),
   password: password(),
   passwordConfirmation: password().sameAs('password'),
@@ -26,5 +26,5 @@ export const signupValidator = vine.create({
  */
 export const loginValidator = vine.create({
   email: email(),
-  password: vine.string(),
+  password: vine.string().maxLength(128),
 })

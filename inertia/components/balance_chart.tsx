@@ -9,6 +9,7 @@ import {
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 import useThemeColors from '~/components/use_theme_colors'
+import ChartData from '~/components/chart_data'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, Tooltip)
 
@@ -28,6 +29,8 @@ export default function BalanceChart({ months }: { months: Month[] }) {
     <>
       <div className="b-chart-line">
         <Line
+          role="img"
+          aria-label="Courbe du solde total en fin de mois. Détail dans les données chiffrées ci-dessous."
           data={{
             labels: months.map((m) => label(m.month)),
             datasets: [
@@ -73,24 +76,24 @@ export default function BalanceChart({ months }: { months: Month[] }) {
           }}
         />
       </div>
-
-      <table className="sr-only">
-        <caption>Solde total en fin de mois</caption>
+      <ChartData caption="Solde total en fin de mois">
         <thead>
           <tr>
-            <th>Mois</th>
-            <th>Solde</th>
+            <th scope="col">Mois</th>
+            <th scope="col" className="b-num">
+              Solde
+            </th>
           </tr>
         </thead>
         <tbody>
           {months.map((m) => (
             <tr key={m.month}>
-              <td>{label(m.month)}</td>
-              <td>{euros(m.balance)}</td>
+              <th scope="row">{label(m.month)}</th>
+              <td className="b-num">{euros(m.balance)}</td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </ChartData>
     </>
   )
 }

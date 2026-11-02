@@ -1,5 +1,7 @@
 import { useForm } from '@inertiajs/react'
 import { useId } from 'react'
+import { today } from '~/lib/dates'
+import FieldError, { fieldProps } from '~/components/field_error'
 
 type Option = { id: number; name: string }
 type AccountOption = Option & { type?: string }
@@ -22,11 +24,11 @@ type Props = {
   accounts: AccountOption[]
   categories: Option[]
   className?: string
+  // Amène le focus sur le formulaire dès son ouverture
+  focusOnMount?: boolean
   onDone?: () => void
   onCancel?: () => void
 }
-
-const today = () => new Date().toISOString().slice(0, 10)
 
 // Compte d'arrivée proposé pour un virement : un compte épargne de préférence
 function defaultTarget(accounts: AccountOption[], fromId: string) {
@@ -40,6 +42,7 @@ export default function TransactionForm({
   accounts,
   categories,
   className = 'b-form',
+  focusOnMount = false,
   onDone,
   onCancel,
 }: Props) {
@@ -104,8 +107,9 @@ export default function TransactionForm({
       <h2 className="section__title">
         {transaction ? "Modifier l'opération" : 'Nouvelle opération'}
       </h2>
+      <p className="field__hint">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
 
-      <div className="b-toggle b-toggle--3">
+      <div className="b-toggle b-toggle--3" role="group" aria-label="Type d’opération">
         <button
           type="button"
           aria-pressed={form.data.type === 'expense'}
@@ -138,16 +142,20 @@ export default function TransactionForm({
 
       <div className="field">
         <label className="field__label" htmlFor={`${uid}-description`}>
-          Description
+          Description <span className="b-item__meta">(100 caractères max.)</span>
         </label>
         <input
           id={`${uid}-description`}
+          required
+          maxLength={100}
+          {...fieldProps(`${uid}-description-error`, form.errors.description)}
           className="field__input"
+          autoFocus={focusOnMount}
           placeholder={isTransfer ? 'Épargne du mois' : undefined}
           value={form.data.description}
           onChange={(e) => form.setData('description', e.target.value)}
         />
-        {form.errors.description && <p className="field__error">{form.errors.description}</p>}
+        <FieldError id={`${uid}-description-error`} message={form.errors.description} />
       </div>
 
       <div className="field">
@@ -156,6 +164,8 @@ export default function TransactionForm({
         </label>
         <input
           id={`${uid}-amount`}
+          required
+          {...fieldProps(`${uid}-amount-error`, form.errors.amount)}
           type="number"
           step="0.01"
           min="0.01"
@@ -163,7 +173,7 @@ export default function TransactionForm({
           value={form.data.amount}
           onChange={(e) => form.setData('amount', e.target.value)}
         />
-        {form.errors.amount && <p className="field__error">{form.errors.amount}</p>}
+        <FieldError id={`${uid}-amount-error`} message={form.errors.amount} />
       </div>
 
       <div className="field">
@@ -172,12 +182,14 @@ export default function TransactionForm({
         </label>
         <input
           id={`${uid}-date`}
+          required
+          {...fieldProps(`${uid}-date-error`, form.errors.date)}
           type="date"
           className="field__input"
           value={form.data.date}
           onChange={(e) => form.setData('date', e.target.value)}
         />
-        {form.errors.date && <p className="field__error">{form.errors.date}</p>}
+        <FieldError id={`${uid}-date-error`} message={form.errors.date} />
       </div>
 
       <div className="field">
@@ -186,6 +198,7 @@ export default function TransactionForm({
         </label>
         <select
           id={`${uid}-account`}
+          required
           className="field__input"
           value={form.data.accountId}
           onChange={(e) => chooseAccount(e.target.value)}
@@ -205,6 +218,8 @@ export default function TransactionForm({
           </label>
           <select
             id={`${uid}-to-account`}
+            required
+            {...fieldProps(`${uid}-to-account-error`, form.errors.toAccountId)}
             className="field__input"
             value={form.data.toAccountId}
             onChange={(e) => form.setData('toAccountId', e.target.value)}
@@ -218,7 +233,7 @@ export default function TransactionForm({
                 </option>
               ))}
           </select>
-          {form.errors.toAccountId && <p className="field__error">{form.errors.toAccountId}</p>}
+          <FieldError id={`${uid}-to-account-error`} message={form.errors.toAccountId} />
         </div>
       ) : (
         <div className="field">
@@ -243,15 +258,17 @@ export default function TransactionForm({
 
       <div className="field">
         <label className="field__label" htmlFor={`${uid}-note`}>
-          Note
+          Note <span className="b-item__meta">(facultatif, 500 caractères max.)</span>
         </label>
         <input
           id={`${uid}-note`}
+          maxLength={500}
+          {...fieldProps(`${uid}-note-error`, form.errors.note)}
           className="field__input"
-          placeholder="Facultatif"
           value={form.data.note}
           onChange={(e) => form.setData('note', e.target.value)}
         />
+        <FieldError id={`${uid}-note-error`} message={form.errors.note} />
       </div>
 
       <div className="b-row">

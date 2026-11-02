@@ -177,7 +177,7 @@ export async function parseStatement(data: Uint8Array): Promise<Statement> {
         })
     )
   }
-  await doc.destroy()
+  await doc.loadingTask.destroy()
   return parseItems(pages)
 }
 

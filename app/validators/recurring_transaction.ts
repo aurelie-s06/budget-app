@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { isoDate } from '#validators/rules'
 import { otherAccount } from '#validators/transaction'
 
 // La date de fin ne peut pas précéder la première échéance
@@ -7,8 +8,6 @@ const afterStart = vine.createRule((value, _, field) => {
     field.report('La date de fin doit être après la première échéance', 'afterStart', field)
   }
 })
-
-const isoDate = () => vine.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 
 export const recurringTransactionValidator = vine.compile(
   vine.object({

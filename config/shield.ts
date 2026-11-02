@@ -9,12 +9,24 @@ const shieldConfig = defineConfig({
     /**
      * Enable the Content-Security-Policy header.
      */
-    enabled: false,
+    enabled: true,
 
     /**
      * Per-resource CSP directives.
+     * style-src : React (attributs style) et sonner injectent des styles en ligne.
      */
-    directives: {},
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", '@nonce', '@viteUrl'],
+      styleSrc: ["'self'", "'unsafe-inline'", '@viteUrl'],
+      imgSrc: ["'self'", 'data:'],
+      fontSrc: ["'self'", 'data:', '@viteUrl'],
+      connectSrc: ["'self'", 'ws:', 'wss:'],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+    },
 
     /**
      * Report violations without blocking resources.

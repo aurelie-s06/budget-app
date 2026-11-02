@@ -5,7 +5,7 @@ import { savingsGoalValidator } from '#validators/savings_goal'
 
 export default class SavingsGoalsController {
   // Création ou modification : un seul objectif par utilisateur
-  async update({ auth, request, response }: HttpContext) {
+  async update({ auth, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const data = await request.validateUsing(savingsGoalValidator)
 
@@ -18,13 +18,15 @@ export default class SavingsGoalsController {
         deadline: data.deadline ? DateTime.fromISO(data.deadline) : null,
       }
     )
+    session.flash('success', 'Objectif enregistré')
     return response.redirect().back()
   }
 
   // Suppression
-  async destroy({ auth, response }: HttpContext) {
+  async destroy({ auth, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     await SavingsGoal.query().where('userId', user.id).delete()
+    session.flash('success', 'Objectif supprimé')
     return response.redirect().back()
   }
 }

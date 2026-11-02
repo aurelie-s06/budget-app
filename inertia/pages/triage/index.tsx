@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react'
 import { Link } from '@adonisjs/inertia/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, CircleCheck, Plus } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
@@ -56,6 +56,8 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
   // Opération choisie dans la file ; sinon la première
   const [pickedId, setPickedId] = useState<number | null>(null)
   const [processing, setProcessing] = useState(false)
+  // Les boutons se désactivent pendant l'envoi : on garde le focus au clavier sur la carte
+  const card = useRef<HTMLElement>(null)
 
   const queue = useMemo(
     () => [
@@ -91,7 +93,10 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
         preserveState: true,
         onStart: () => setProcessing(true),
         onFinish: () => setProcessing(false),
-        onSuccess: () => setPickedId(null),
+        onSuccess: () => {
+          setPickedId(null)
+          card.current?.focus()
+        },
       }
     )
   }
@@ -100,6 +105,7 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
     if (!current) return
     setSkipped((prev) => [...prev.filter((id) => id !== current.id), current.id])
     setPickedId(null)
+    card.current?.focus()
   }
 
   function createCategory(e: React.FormEvent) {
@@ -139,13 +145,13 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
     <>
       <Head title="À classer" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
               <Link href="/transactions" className="b-link b-back">
                 <ArrowLeft size={14} aria-hidden="true" />
-                Opérations
+                Retour aux opérations
               </Link>
               <h1 className="page__title">À classer</h1>
               <p className="page__description">
@@ -160,6 +166,7 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
                 {(['expense', 'income'] as const).map((k) => (
                   <button
                     key={k}
+                    type="button"
                     aria-pressed={kind === k}
                     onClick={() => router.get('/triage', k === 'expense' ? {} : { kind: k })}
                   >
@@ -193,7 +200,11 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
             </section>
           ) : (
             <div className="b-split b-triage">
-              <section className="panel b-triage__card" aria-live="polite">
+              <section ref={card} tabIndex={-1} className="panel b-triage__card">
+                <h2 className="sr-only">Opération à classer</h2>
+                <p className="sr-only" aria-live="polite">
+                  {current.description}, {euros(current.amount)}, {longDate(current.date)}.
+                </p>
                 <p className="b-triage__progress">
                   {items.length} restante{items.length > 1 ? 's' : ''}
                 </p>
@@ -244,6 +255,7 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
                         autoFocus
                         aria-label="Nom de la nouvelle catégorie"
                         placeholder="Nom"
+                        maxLength={50}
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
                         onKeyDown={(e) => e.key === 'Escape' && setCreating(false)}
@@ -291,6 +303,10 @@ export default function TriageIndex({ kind, counts, items, categories }: Props) 
                     Passer pour l’instant
                   </button>
                 </div>
+                <p className="b-form__hint b-triage__keys">
+                  Au clavier : touches 1 à 9 pour choisir une catégorie, 0 pour garder, Échap pour
+                  passer.
+                </p>
               </section>
 
               <aside className="panel b-triage__queue">

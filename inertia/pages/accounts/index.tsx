@@ -2,6 +2,8 @@ import { Head, useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import { today } from '~/lib/dates'
+import FieldError, { fieldProps } from '~/components/field_error'
 
 type Account = {
   id: number
@@ -21,7 +23,6 @@ const TYPE_LABELS = {
   autre: 'Autre',
 }
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-const today = () => new Date().toISOString().slice(0, 10)
 const shortDate = (iso: string) =>
   new Date(`${iso}T00:00`).toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -70,6 +71,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
       balanceDate: a.balanceDate ?? today(),
       color: a.color ?? '#0a0a0b',
     })
+    document.getElementById('name')?.focus()
   }
 
   function cancel() {
@@ -86,7 +88,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
     <>
       <Head title="Comptes" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
@@ -116,11 +118,15 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
                         {euros(a.balance)}
                       </span>
                       <div className="b-actions">
-                        <button className="b-link" onClick={() => edit(a)}>
-                          Modifier
+                        <button type="button" className="b-link" onClick={() => edit(a)}>
+                          Modifier<span className="sr-only"> {a.name}</span>
                         </button>
-                        <button className="b-link b-link--danger" onClick={() => remove(a)}>
-                          Supprimer
+                        <button
+                          type="button"
+                          className="b-link b-link--danger"
+                          onClick={() => remove(a)}
+                        >
+                          Supprimer<span className="sr-only"> {a.name}</span>
                         </button>
                       </div>
                     </li>
@@ -133,18 +139,24 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
               <h2 className="section__title">
                 {editingId ? 'Modifier le compte' : 'Nouveau compte'}
               </h2>
+              <p className="field__hint">
+                Les champs marqués d’un astérisque (*) sont obligatoires.
+              </p>
 
               <div className="field">
                 <label className="field__label" htmlFor="name">
-                  Nom
+                  Nom <span className="b-item__meta">(50 caractères max.)</span>
                 </label>
                 <input
                   id="name"
+                  required
+                  maxLength={50}
+                  {...fieldProps('name-error', form.errors.name)}
                   className="field__input"
                   value={form.data.name}
                   onChange={(e) => form.setData('name', e.target.value)}
                 />
-                {form.errors.name && <p className="field__error">{form.errors.name}</p>}
+                <FieldError id="name-error" message={form.errors.name} />
               </div>
 
               <div className="field">
@@ -153,6 +165,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
                 </label>
                 <select
                   id="type"
+                  required
                   className="field__input"
                   value={form.data.type}
                   onChange={(e) => form.setData('type', e.target.value as Account['type'])}
@@ -166,8 +179,15 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
               </div>
 
               <div className="field">
-                <span className="field__label">Solde</span>
-                <div className="b-toggle">
+                <span id="balance-kind" className="field__label">
+                  Solde
+                </span>
+                <div
+                  className="b-toggle"
+                  role="group"
+                  aria-labelledby="balance-kind"
+                  aria-describedby="balance-kind-hint"
+                >
                   <button
                     type="button"
                     aria-pressed={form.data.knownAtDate}
@@ -183,7 +203,7 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
                     Solde de départ
                   </button>
                 </div>
-                <p className="field__hint">
+                <p id="balance-kind-hint" className="field__hint">
                   {form.data.knownAtDate
                     ? 'Le solde affiché par ta banque ce jour-là. Les opérations plus anciennes que tu ajoutes ne le modifient pas.'
                     : 'Le solde avant toutes les opérations du compte.'}
@@ -197,6 +217,8 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
                   </label>
                   <input
                     id="balance"
+                    required
+                    {...fieldProps('balance-error', form.errors.initialBalance)}
                     type="number"
                     step="0.01"
                     className="field__input"
@@ -211,6 +233,8 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
                     </label>
                     <input
                       id="balance-date"
+                      required
+                      {...fieldProps('balance-date-error', form.errors.balanceDate)}
                       type="date"
                       className="field__input"
                       value={form.data.balanceDate}
@@ -219,10 +243,8 @@ export default function AccountsIndex({ accounts }: { accounts: Account[] }) {
                   </div>
                 )}
               </div>
-              {form.errors.initialBalance && (
-                <p className="field__error">{form.errors.initialBalance}</p>
-              )}
-              {form.errors.balanceDate && <p className="field__error">{form.errors.balanceDate}</p>}
+              <FieldError id="balance-error" message={form.errors.initialBalance} />
+              <FieldError id="balance-date-error" message={form.errors.balanceDate} />
 
               <div className="field">
                 <label className="field__label" htmlFor="color">

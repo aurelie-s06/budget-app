@@ -5,10 +5,12 @@ import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import Stat from '~/components/stat'
+import { today } from '~/lib/dates'
 import ExpensesChart from '~/components/expenses_chart'
 import SpendingCalendar from '~/components/spending_calendar'
 import BudgetList, { type Budget } from '~/components/budget_list'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
+import TransferRoute from '~/components/transfer_route'
 
 type Transaction = EditableTransaction & {
   accountName: string
@@ -38,10 +40,16 @@ type Props = {
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 // Signe et couleur du montant selon le type d'opération
+const TRANSFER_SIGN = (
+  <>
+    <span aria-hidden="true">⇄</span>
+    <span className="sr-only">Virement de</span>
+  </>
+)
 const AMOUNT = {
   income: { sign: '+', className: 'b-amount--in' },
   expense: { sign: '−', className: 'b-amount--out' },
-  transfer: { sign: '⇄', className: 'b-amount--move' },
+  transfer: { sign: TRANSFER_SIGN, className: 'b-amount--move' },
 }
 
 export default function MonthShow(props: Props) {
@@ -57,7 +65,7 @@ export default function MonthShow(props: Props) {
   }
 
   // Nouvelle opération : aujourd'hui si c'est le mois affiché, sinon le 1er du mois
-  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayIso = today()
   const defaultDate = todayIso.startsWith(props.month) ? todayIso : `${props.month}-01`
 
   function startEdit(id: number) {
@@ -76,7 +84,7 @@ export default function MonthShow(props: Props) {
     }
   }
 
-  const title = new Date(`${props.month}-01`).toLocaleDateString('fr-FR', {
+  const title = new Date(`${props.month}-01T00:00`).toLocaleDateString('fr-FR', {
     month: 'long',
     year: 'numeric',
   })
@@ -93,11 +101,13 @@ export default function MonthShow(props: Props) {
     <>
       <Head title={title} />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
-              <h1 className="page__title b-capitalize">{title}</h1>
+              <h1 className="page__title b-capitalize" aria-live="polite">
+                {title}
+              </h1>
               <p className="page__description">
                 {props.transactions.length} opération{props.transactions.length > 1 ? 's' : ''} ce
                 mois-ci
@@ -108,7 +118,9 @@ export default function MonthShow(props: Props) {
                 href={`/months?month=${props.previous}`}
                 className="iconbtn"
                 aria-label="Mois précédent"
+                title="Mois précédent"
                 preserveScroll
+                preserveState
               >
                 <ChevronLeft size={16} />
               </Link>
@@ -116,7 +128,9 @@ export default function MonthShow(props: Props) {
                 href={`/months?month=${props.next}`}
                 className="iconbtn"
                 aria-label="Mois suivant"
+                title="Mois suivant"
                 preserveScroll
+                preserveState
               >
                 <ChevronRight size={16} />
               </Link>
@@ -180,8 +194,9 @@ export default function MonthShow(props: Props) {
                   Gérer les opérations
                 </Link>
                 {!adding && props.accounts.length > 0 && (
-                  <button className="btn btn--primary btn--sm" onClick={startAdd}>
-                    <Plus size={14} /> Ajouter
+                  <button type="button" className="btn btn--primary btn--sm" onClick={startAdd}>
+                    <Plus size={14} aria-hidden="true" /> Ajouter
+                    <span className="sr-only"> une opération</span>
                   </button>
                 )}
               </div>
@@ -190,6 +205,7 @@ export default function MonthShow(props: Props) {
               <div className="b-add-form">
                 <TransactionForm
                   defaultDate={defaultDate}
+                  focusOnMount
                   accounts={props.accounts}
                   categories={props.categories}
                   className="b-form b-form--inline"
@@ -207,6 +223,7 @@ export default function MonthShow(props: Props) {
                     <li key={t.id} className="b-item b-item--edit">
                       <TransactionForm
                         transaction={t}
+                        focusOnMount
                         accounts={props.accounts}
                         categories={props.categories}
                         className="b-form b-form--inline"
@@ -223,24 +240,33 @@ export default function MonthShow(props: Props) {
                       <div className="b-item__main">
                         <div className="b-item__title">{t.description}</div>
                         <div className="b-item__meta">
-                          {new Date(t.date).toLocaleDateString('fr-FR', {
+                          {new Date(`${t.date}T00:00`).toLocaleDateString('fr-FR', {
                             day: 'numeric',
                             month: 'long',
                           })}
-                          {t.type === 'transfer'
-                            ? ` · ${t.accountName} → ${t.toAccountName}`
-                            : t.categoryName && ` · ${t.categoryName}`}
+                          {t.type === 'transfer' ? (
+                            <>
+                              {' · '}
+                              <TransferRoute from={t.accountName} to={t.toAccountName} />
+                            </>
+                          ) : (
+                            t.categoryName && ` · ${t.categoryName}`
+                          )}
                         </div>
                       </div>
                       <span className={`b-amount ${AMOUNT[t.type].className}`}>
                         {AMOUNT[t.type].sign} {euros(t.amount)}
                       </span>
                       <div className="b-actions">
-                        <button className="b-link" onClick={() => startEdit(t.id)}>
-                          Modifier
+                        <button type="button" className="b-link" onClick={() => startEdit(t.id)}>
+                          Modifier<span className="sr-only"> {t.description}</span>
                         </button>
-                        <button className="b-link b-link--danger" onClick={() => remove(t)}>
-                          Supprimer
+                        <button
+                          type="button"
+                          className="b-link b-link--danger"
+                          onClick={() => remove(t)}
+                        >
+                          Supprimer<span className="sr-only"> {t.description}</span>
                         </button>
                       </div>
                     </li>

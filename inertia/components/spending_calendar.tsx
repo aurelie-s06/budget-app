@@ -1,4 +1,5 @@
 import { Link } from '@adonisjs/inertia/react'
+import { today } from '~/lib/dates'
 
 type Day = { date: string; amount: number }
 
@@ -16,12 +17,12 @@ function level(amount: number, max: number) {
  * Survol : montant dépensé ce jour-là ; clic : opérations du jour.
  */
 export default function SpendingCalendar({ days }: { days: Day[] }) {
-  const today = new Date().toISOString().slice(0, 10)
+  const todayIso = today()
   const max = Math.max(0, ...days.map((d) => d.amount))
   // Lundi = 0 : cases vides avant le 1er du mois
   const offset = (new Date(`${days[0].date}T00:00`).getDay() + 6) % 7
 
-  const past = days.filter((d) => d.date <= today)
+  const past = days.filter((d) => d.date <= todayIso)
   const noSpend = past.filter((d) => d.amount === 0).length
   const top = days.reduce((a, b) => (b.amount > a.amount ? b : a), days[0])
   const dayLabel = (date: string, opts: Intl.DateTimeFormatOptions) =>
@@ -29,7 +30,7 @@ export default function SpendingCalendar({ days }: { days: Day[] }) {
 
   return (
     <div className="b-cal">
-      <div className="b-cal__grid" role="list">
+      <div className="b-cal__grid">
         {WEEKDAYS.map((w, i) => (
           <span key={i} className="b-cal__weekday" aria-hidden="true">
             {w}
@@ -39,22 +40,22 @@ export default function SpendingCalendar({ days }: { days: Day[] }) {
           <span key={`empty-${i}`} aria-hidden="true" />
         ))}
         {days.map((d) => {
-          const future = d.date > today
+          const future = d.date > todayIso
           const label = dayLabel(d.date, { weekday: 'long', day: 'numeric', month: 'long' })
           const amount = future ? 'à venir' : d.amount > 0 ? euros(d.amount) : 'aucune dépense'
           const className = [
             'b-cal__day',
             `b-cal__day--l${level(d.amount, max)}`,
             future && 'b-cal__day--future',
-            d.date === today && 'b-cal__day--today',
+            d.date === todayIso && 'b-cal__day--today',
           ]
             .filter(Boolean)
             .join(' ')
-          // Bulle affichée au survol (ou au focus clavier)
+          // Bulle affichée au survol (ou au focus clavier), déjà lue via aria-label
           const content = (
             <>
               {Number(d.date.slice(8))}
-              <span className="b-cal__tip" role="tooltip">
+              <span className="b-cal__tip" aria-hidden="true">
                 <span className="b-capitalize">{label}</span>
                 <strong>{amount}</strong>
               </span>
@@ -63,13 +64,12 @@ export default function SpendingCalendar({ days }: { days: Day[] }) {
 
           // Un jour passé ouvre ses opérations
           return future ? (
-            <span key={d.date} role="listitem" className={className} tabIndex={0}>
+            <span key={d.date} className={className}>
               {content}
             </span>
           ) : (
             <Link
               key={d.date}
-              role="listitem"
               href={`/transactions?day=${d.date}`}
               className={className}
               aria-label={`${label} : ${amount}. Voir les opérations du jour`}

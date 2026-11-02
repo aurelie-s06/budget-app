@@ -1,6 +1,8 @@
 import AuthLayout from '~/layouts/auth'
 import { Head } from '@inertiajs/react'
 import { Form, Link } from '@adonisjs/inertia/react'
+import FieldError, { fieldProps } from '~/components/field_error'
+import PasswordInput from '~/components/password_input'
 
 export default function Login() {
   return (
@@ -12,6 +14,7 @@ export default function Login() {
       <Form route="session.store">
         {({ errors, processing }) => (
           <div className="auth__form">
+            <p className="field__hint">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
             <div className="field">
               <label className="field__label" htmlFor="email">
                 Adresse email
@@ -23,25 +26,24 @@ export default function Login() {
                 className="field__input"
                 autoComplete="username"
                 placeholder="prenom@exemple.fr"
-                aria-invalid={errors.email ? 'true' : 'false'}
+                required
+                {...fieldProps('email-error', errors.email)}
               />
-              {errors.email && <span className="field__error">{errors.email}</span>}
+              <FieldError id="email-error" message={errors.email} />
             </div>
 
             <div className="field">
               <label className="field__label" htmlFor="password">
                 Mot de passe
               </label>
-              <input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
-                className="field__input"
                 autoComplete="current-password"
-                placeholder="••••••••"
-                aria-invalid={errors.password ? 'true' : 'false'}
+                required
+                hint="Attention aux majuscules et aux minuscules."
+                error={errors.password}
               />
-              {errors.password && <span className="field__error">{errors.password}</span>}
             </div>
 
             <button
@@ -56,6 +58,7 @@ export default function Login() {
         )}
       </Form>
 
+      <p className="auth__foot">Par sécurité, la session se ferme après 2 h sans activité.</p>
       <p className="auth__foot">
         Pas encore de compte ?{' '}
         <Link route="new_account.create" className="il">

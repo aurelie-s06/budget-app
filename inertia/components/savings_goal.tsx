@@ -1,6 +1,8 @@
 import { router, useForm } from '@inertiajs/react'
 import { useState } from 'react'
 import { Target } from 'lucide-react'
+import { currentMonth, today } from '~/lib/dates'
+import FieldError, { fieldProps } from '~/components/field_error'
 
 export type Goal = {
   name: string
@@ -26,7 +28,7 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
     name: '',
     targetAmount: '',
     // Par défaut, on compte l'épargne depuis le début du mois
-    startDate: `${new Date().toISOString().slice(0, 7)}-01`,
+    startDate: `${currentMonth()}-01`,
     deadline: '',
   }
   const form = useForm(
@@ -72,18 +74,22 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
   if (editing) {
     return (
       <form className="b-form b-goal-form" onSubmit={submit}>
+        <p className="field__hint">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
         <div className="field">
           <label className="field__label" htmlFor="goal-name">
-            Objectif
+            Objectif <span className="b-item__meta">(50 caractères max.)</span>
           </label>
           <input
             id="goal-name"
+            required
+            maxLength={50}
+            {...fieldProps('goal-name-error', form.errors.name)}
             className="field__input"
             placeholder="Vacances, voiture…"
             value={form.data.name}
             onChange={(e) => form.setData('name', e.target.value)}
           />
-          {form.errors.name && <p className="field__error">{form.errors.name}</p>}
+          <FieldError id="goal-name-error" message={form.errors.name} />
         </div>
         <div className="field">
           <label className="field__label" htmlFor="goal-target">
@@ -91,6 +97,8 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
           </label>
           <input
             id="goal-target"
+            required
+            {...fieldProps('goal-target-error', form.errors.targetAmount)}
             className="field__input"
             type="number"
             min="0"
@@ -98,7 +106,7 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
             value={form.data.targetAmount}
             onChange={(e) => form.setData('targetAmount', e.target.value)}
           />
-          {form.errors.targetAmount && <p className="field__error">{form.errors.targetAmount}</p>}
+          <FieldError id="goal-target-error" message={form.errors.targetAmount} />
         </div>
         <div className="b-row">
           <div className="field">
@@ -107,11 +115,14 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
             </label>
             <input
               id="goal-start"
+              required
+              {...fieldProps('goal-start-error', form.errors.startDate)}
               className="field__input"
               type="date"
               value={form.data.startDate}
               onChange={(e) => form.setData('startDate', e.target.value)}
             />
+            <FieldError id="goal-start-error" message={form.errors.startDate} />
           </div>
           <div className="field">
             <label className="field__label" htmlFor="goal-deadline">
@@ -119,15 +130,17 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
             </label>
             <input
               id="goal-deadline"
+              {...fieldProps('goal-deadline-error', form.errors.deadline)}
               className="field__input"
               type="date"
               value={form.data.deadline}
               onChange={(e) => form.setData('deadline', e.target.value)}
             />
+            <FieldError id="goal-deadline-error" message={form.errors.deadline} />
           </div>
         </div>
         <div className="b-row">
-          <button className="btn btn--primary btn--sm" disabled={form.processing}>
+          <button type="submit" className="btn btn--primary btn--sm" disabled={form.processing}>
             Enregistrer
           </button>
           <button
@@ -151,7 +164,11 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
       <div className="b-goal b-goal--empty">
         <Target size={22} aria-hidden="true" />
         <p>Fixe-toi un montant à mettre de côté et suis ta progression.</p>
-        <button className="btn btn--secondary btn--sm" onClick={() => setEditing(true)}>
+        <button
+          type="button"
+          className="btn btn--secondary btn--sm"
+          onClick={() => setEditing(true)}
+        >
           Définir un objectif
         </button>
       </div>
@@ -159,7 +176,7 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
   }
 
   const reached = goal.remaining <= 0
-  const late = goal.deadline !== null && goal.deadline < new Date().toISOString().slice(0, 10)
+  const late = goal.deadline !== null && goal.deadline < today()
 
   return (
     <div className="b-goal">
@@ -191,11 +208,11 @@ export default function SavingsGoal({ goal }: { goal: Goal | null }) {
               : `Encore ${euros(goal.remaining)}`}
       </p>
       <div className="b-actions b-goal__actions">
-        <button className="b-link" onClick={() => setEditing(true)}>
-          Modifier
+        <button type="button" className="b-link" onClick={() => setEditing(true)}>
+          Modifier<span className="sr-only"> l’objectif</span>
         </button>
-        <button className="b-link b-link--danger" onClick={remove}>
-          Supprimer
+        <button type="button" className="b-link b-link--danger" onClick={remove}>
+          Supprimer<span className="sr-only"> l’objectif</span>
         </button>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
-
-const isoDate = () => vine.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+import { isoDate } from '#validators/rules'
 
 // Envoi du relevé à lire
 export const statementValidator = vine.create({

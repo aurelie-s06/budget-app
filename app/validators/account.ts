@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { isoDate } from '#validators/rules'
 
 export const accountValidator = vine.compile(
   vine.object({
@@ -6,11 +7,7 @@ export const accountValidator = vine.compile(
     type: vine.enum(['courant', 'epargne', 'especes', 'autre']),
     initialBalance: vine.number(),
     // Rempli : initialBalance est le solde connu ce jour-là
-    balanceDate: vine
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/)
-      .nullable()
-      .optional(),
+    balanceDate: isoDate().nullable().optional(),
     color: vine
       .string()
       .trim()

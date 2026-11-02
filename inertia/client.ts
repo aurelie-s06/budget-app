@@ -5,5 +5,3 @@ export const client = createTuyau({
   baseUrl: '/',
   registry,
 })
-
-export const urlFor = client.urlFor

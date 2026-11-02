@@ -96,7 +96,7 @@ export default class TransactionsController {
     })
   }
 
-  async store({ auth, request, response }: HttpContext) {
+  async store({ auth, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const data = cleanup(await request.validateUsing(transactionValidator))
     await checkOwnership(user, data.accountId, data.categoryId, data.toAccountId)
@@ -105,10 +105,11 @@ export default class TransactionsController {
       ...data,
       date: DateTime.fromISO(data.date),
     })
+    session.flash('success', 'Opération ajoutée')
     return response.redirect().back()
   }
 
-  async update({ auth, params, request, response }: HttpContext) {
+  async update({ auth, params, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const transaction = await user
       .related('transactions')
@@ -120,10 +121,11 @@ export default class TransactionsController {
 
     transaction.merge({ ...data, date: DateTime.fromISO(data.date) })
     await transaction.save()
+    session.flash('success', 'Opération modifiée')
     return response.redirect().back()
   }
 
-  async destroy({ auth, params, response }: HttpContext) {
+  async destroy({ auth, params, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const transaction = await user
       .related('transactions')
@@ -131,6 +133,7 @@ export default class TransactionsController {
       .where('id', params.id)
       .firstOrFail()
     await transaction.delete()
+    session.flash('success', 'Opération supprimée')
     return response.redirect().back()
   }
 }

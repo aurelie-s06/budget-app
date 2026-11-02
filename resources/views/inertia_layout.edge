@@ -3,6 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Mon Budget : suis tes comptes, tes dépenses, tes budgets par catégorie et ton épargne, au même endroit."
+    />
     <title data-inertia>
       Mon Budget
     </title>
@@ -20,7 +24,20 @@
       content="{{ request.plainCookie('app_theme', { defaultValue: 'light', encoded: false }) === 'dark' ? '#111114' : '#ffffff' }}"
     />
 
-    @viteReactRefresh()
+    {{-- Dans le layout : masqués même avant le chargement de la feuille de styles --}}
+    <style>
+      .b-skip { margin: 0; padding: 0; list-style: none; }
+      .b-skip a:not(:focus) {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+    </style>
+
+    @viteReactRefresh({ nonce: cspNonce })
     @vite(['inertia/app.tsx'])
     @inertiaHead()
     @stack('dumper')

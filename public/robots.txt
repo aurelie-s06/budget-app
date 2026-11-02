@@ -1,0 +1,5 @@
+# Application personnelle : seules les pages publiques peuvent être indexées
+User-agent: *
+Allow: /$
+Allow: /confidentialite
+Disallow: /

@@ -31,7 +31,7 @@ export default class TriageController {
   }
 
   // Classe une ou plusieurs opérations ; elles ne reviennent plus dans la liste
-  async update({ auth, request, response }: HttpContext) {
+  async update({ auth, request, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const { ids, categoryId, description } = await request.validateUsing(triageValidator)
     // La catégorie doit appartenir à l'utilisateur (sinon : 404)
@@ -45,6 +45,12 @@ export default class TriageController {
       t.reviewedAt = reviewedAt
       await t.save()
     }
+    session.flash(
+      'success',
+      transactions.length === 1
+        ? '1 opération classée'
+        : `${transactions.length} opérations classées`
+    )
     return response.redirect().back()
   }
 }

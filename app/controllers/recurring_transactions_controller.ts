@@ -91,7 +91,7 @@ export default class RecurringTransactionsController {
   }
 
   // Les opérations déjà créées sont conservées (recurring_id remis à NULL par la base)
-  async destroy({ auth, params, response }: HttpContext) {
+  async destroy({ auth, params, response, session }: HttpContext) {
     const user = auth.getUserOrFail()
     const rule = await user
       .related('recurringTransactions')
@@ -99,6 +99,7 @@ export default class RecurringTransactionsController {
       .where('id', params.id)
       .firstOrFail()
     await rule.delete()
+    session.flash('success', 'Opération récurrente supprimée')
     return response.redirect().back()
   }
 }

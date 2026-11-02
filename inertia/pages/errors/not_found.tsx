@@ -1,31 +1,10 @@
-import { Head } from '@inertiajs/react'
-import Footer from '~/components/footer'
+import ErrorPage from '~/components/error_page'
 
 export default function NotFound() {
   return (
-    <div className="b-landing">
-      <Head title="Page introuvable" />
-      <main className="home">
-        <article className="prose-card">
-          <div className="pc-top">
-            <span className="pc-status mono tag" style={{ color: 'var(--subtle)' }}>
-              <span className="dot" /> 404
-            </span>
-          </div>
-          <div className="pc-lead">
-            <span>Page introuvable.</span>
-            <em>Cette adresse ne mène nulle part.</em>
-          </div>
-          <p className="pc-para">
-            La page que tu cherches n&apos;existe pas ou a été déplacée. Vérifie l&apos;adresse ou
-            reviens à l&apos;accueil.
-          </p>
-          <a href="/" className="btn btn--primary pc-action">
-            Retour à l&apos;accueil
-          </a>
-        </article>
-      </main>
-      <Footer />
-    </div>
+    <ErrorPage code={404} title="Page introuvable" lead="Cette adresse ne mène nulle part.">
+      La page que tu cherches n’existe pas ou a été déplacée. Vérifie l’adresse, ou utilise le menu
+      pour repartir.
+    </ErrorPage>
   )
 }

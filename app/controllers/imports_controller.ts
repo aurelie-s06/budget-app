@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { readFile } from 'node:fs/promises'
+import db from '@adonisjs/lucid/services/db'
+import { readFile, rm } from 'node:fs/promises'
 import { DateTime } from 'luxon'
 import { checkOwnership } from '#services/ownership_service'
 import { balanceAt, suggest } from '#services/import_service'
@@ -26,6 +27,9 @@ export default class ImportsController {
       if (!(error instanceof StatementError)) throw error
       session.flash('error', error.message)
       return response.redirect().toRoute('imports.index')
+    } finally {
+      // Le relevé ne reste pas dans le dossier temporaire du système
+      await rm(file.tmpPath!, { force: true })
     }
 
     const lines = await suggest(user, accountId, statement)
@@ -52,47 +56,51 @@ export default class ImportsController {
     const { accountId, lines, learn } = await request.validateUsing(importValidator)
     await checkOwnership(user, accountId)
 
-    for (const line of lines) {
-      const [kind, id] = (line.target ?? '').split(':')
-      const otherAccount = kind === 'acc' ? Number(id) : null
-      const categoryId = kind === 'cat' ? Number(id) : null
-      await checkOwnership(user, accountId, categoryId, otherAccount)
+    // Tout ou rien : une erreur en cours de route n'importe pas la moitié du relevé
+    await db.transaction(async (trx) => {
+      user.useTransaction(trx)
+      for (const line of lines) {
+        const [kind, id] = (line.target ?? '').split(':')
+        const otherAccount = kind === 'acc' ? Number(id) : null
+        const categoryId = kind === 'cat' ? Number(id) : null
+        await checkOwnership(user, accountId, categoryId, otherAccount)
 
-      const common = {
-        amount: line.amount,
-        date: DateTime.fromISO(line.date),
-        description: line.description,
-        note: line.note,
-        bankLabel: line.label,
+        const common = {
+          amount: line.amount,
+          date: DateTime.fromISO(line.date),
+          description: line.description,
+          note: line.note,
+          bankLabel: line.label,
+        }
+        if (otherAccount && otherAccount !== accountId) {
+          // Virement : sort du compte pour un débit, y entre pour un crédit
+          await user.related('transactions').create({
+            ...common,
+            type: 'transfer',
+            accountId: line.direction === 'debit' ? accountId : otherAccount,
+            toAccountId: line.direction === 'debit' ? otherAccount : accountId,
+            categoryId: null,
+          })
+        } else {
+          await user.related('transactions').create({
+            ...common,
+            type: line.direction === 'debit' ? 'expense' : 'income',
+            accountId,
+            categoryId,
+          })
+        }
       }
-      if (otherAccount && otherAccount !== accountId) {
-        // Virement : sort du compte pour un débit, y entre pour un crédit
-        await user.related('transactions').create({
-          ...common,
-          type: 'transfer',
-          accountId: line.direction === 'debit' ? accountId : otherAccount,
-          toAccountId: line.direction === 'debit' ? otherAccount : accountId,
-          categoryId: null,
-        })
-      } else {
-        await user.related('transactions').create({
-          ...common,
-          type: line.direction === 'debit' ? 'expense' : 'income',
-          accountId,
-          categoryId,
-        })
-      }
-    }
 
-    // Les opérations déjà saisies apprennent leur libellé bancaire
-    for (const { id, label } of learn) {
-      await user
-        .related('transactions')
-        .query()
-        .where('id', id)
-        .whereNull('bank_label')
-        .update({ bank_label: label })
-    }
+      // Les opérations déjà saisies apprennent leur libellé bancaire
+      for (const { id, label } of learn) {
+        await user
+          .related('transactions')
+          .query()
+          .where('id', id)
+          .whereNull('bank_label')
+          .update({ bank_label: label })
+      }
+    })
 
     const months = [...new Set(lines.map((l) => l.date.slice(0, 7)))].sort()
     session.flash(

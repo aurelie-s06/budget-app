@@ -49,7 +49,7 @@ export default function Dashboard(props: Props) {
     <>
       <Head title="Tableau de bord" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
@@ -61,6 +61,7 @@ export default function Dashboard(props: Props) {
                 {PERIODS.map((p) => (
                   <button
                     key={p.value}
+                    type="button"
                     aria-pressed={props.period === p.value}
                     onClick={() => changePeriod(p.value)}
                   >
@@ -101,7 +102,7 @@ export default function Dashboard(props: Props) {
               <header className="b-tile__head">
                 <h2 className="b-tile__label b-capitalize">{month}</h2>
                 <Link href="/months" className="b-link">
-                  Détail
+                  Détail du mois
                 </Link>
               </header>
               <dl className="b-figures">
@@ -154,7 +155,7 @@ export default function Dashboard(props: Props) {
                   <h2 className="section__title">Revenus et dépenses</h2>
                   <p className="section__description">
                     Sur {periodLabel === 'tout' ? 'tout l’historique' : periodLabel}. Clique sur un
-                    mois pour voir son détail.
+                    mois du graphique ou de ses données chiffrées pour voir son détail.
                   </p>
                 </div>
               </header>

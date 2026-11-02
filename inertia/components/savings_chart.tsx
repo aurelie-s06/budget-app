@@ -1,7 +1,9 @@
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 import { router } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import useThemeColors from '~/components/use_theme_colors'
+import ChartData from '~/components/chart_data'
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
@@ -22,6 +24,8 @@ export default function SavingsChart({ months }: { months: Month[] }) {
     <>
       <div className="b-chart-line">
         <Bar
+          role="img"
+          aria-label="Barres de l’épargne versée chaque mois. Détail dans les données chiffrées ci-dessous."
           data={{
             labels: months.map((m) => label(m.month)),
             datasets: [
@@ -67,24 +71,28 @@ export default function SavingsChart({ months }: { months: Month[] }) {
           }}
         />
       </div>
-
-      <table className="sr-only">
-        <caption>Épargne par mois</caption>
+      <ChartData caption="Épargne par mois">
         <thead>
           <tr>
-            <th>Mois</th>
-            <th>Épargne</th>
+            <th scope="col">Mois</th>
+            <th scope="col" className="b-num">
+              Épargne
+            </th>
           </tr>
         </thead>
         <tbody>
           {months.map((m) => (
             <tr key={m.month}>
-              <td>{label(m.month)}</td>
-              <td>{euros(m.savings)}</td>
+              <th scope="row">
+                <Link href={`/months?month=${m.month}`} className="il">
+                  {label(m.month)}
+                </Link>
+              </th>
+              <td className="b-num">{euros(m.savings)}</td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </ChartData>
     </>
   )
 }

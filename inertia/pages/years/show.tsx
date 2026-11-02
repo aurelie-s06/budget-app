@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import Stat from '~/components/stat'
+import { currentMonth } from '~/lib/dates'
 
 type Month = { month: string; income: number; expenses: number; savings: number; rest: number }
 type CategoryRow = {
@@ -24,16 +25,21 @@ type Props = {
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 // Dans le tableau : sans centimes, pour que les 12 mois tiennent
 const short = (n: number) =>
-  n === 0
-    ? '—'
-    : n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+  n === 0 ? (
+    <>
+      <span aria-hidden="true">—</span>
+      <span className="sr-only">0 €</span>
+    </>
+  ) : (
+    n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+  )
 const monthName = (month: string) =>
-  new Date(`${month}-01`).toLocaleDateString('fr-FR', { month: 'short' })
+  new Date(`${month}-01T00:00`).toLocaleDateString('fr-FR', { month: 'short' })
 
 export default function YearShow({ year, months, categories }: Props) {
-  const currentMonth = new Date().toISOString().slice(0, 7)
+  const thisMonth = currentMonth()
   // Mois écoulés : sert aux moyennes (toute l'année si elle est passée)
-  const elapsed = months.filter((m) => m.month <= currentMonth).length || 12
+  const elapsed = months.filter((m) => m.month <= thisMonth).length || 12
   const sum = (key: keyof Omit<Month, 'month'>) => months.reduce((s, m) => s + m[key], 0)
   const income = sum('income')
   const expenses = sum('expenses')
@@ -53,11 +59,13 @@ export default function YearShow({ year, months, categories }: Props) {
     <>
       <Head title={`Année ${year}`} />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
-              <h1 className="page__title">{year}</h1>
+              <h1 className="page__title" aria-live="polite">
+                {year}
+              </h1>
               <p className="page__description">Ton année mois par mois, catégorie par catégorie.</p>
             </div>
             <div className="page__actions b-month-nav">
@@ -65,7 +73,9 @@ export default function YearShow({ year, months, categories }: Props) {
                 href={`/years?year=${year - 1}`}
                 className="iconbtn"
                 aria-label="Année précédente"
+                title="Année précédente"
                 preserveScroll
+                preserveState
               >
                 <ChevronLeft size={16} />
               </Link>
@@ -73,7 +83,9 @@ export default function YearShow({ year, months, categories }: Props) {
                 href={`/years?year=${year + 1}`}
                 className="iconbtn"
                 aria-label="Année suivante"
+                title="Année suivante"
                 preserveScroll
+                preserveState
               >
                 <ChevronRight size={16} />
               </Link>
@@ -117,7 +129,8 @@ export default function YearShow({ year, months, categories }: Props) {
                 <h2 className="section__title">Dépenses par catégorie</h2>
                 <p className="section__description">
                   Plus la case est colorée, plus tu as dépensé ce mois-là dans la catégorie. Les
-                  montants en rouge dépassent le budget mensuel. Clique sur un mois pour son détail.
+                  cases rouges, marquées d’un point d’exclamation, dépassent le budget mensuel.
+                  Clique sur un mois pour son détail.
                 </p>
               </div>
             </header>
@@ -127,6 +140,9 @@ export default function YearShow({ year, months, categories }: Props) {
             ) : (
               <div className="b-table-wrap">
                 <table className="b-table b-year">
+                  <caption className="sr-only">
+                    Dépenses par catégorie et par mois en {year}
+                  </caption>
                   <thead>
                     <tr>
                       <th scope="col">Catégorie</th>
@@ -136,8 +152,8 @@ export default function YearShow({ year, months, categories }: Props) {
                           scope="col"
                           className={[
                             'b-num',
-                            m.month === currentMonth && 'b-year__current',
-                            m.month > currentMonth && 'b-year__future',
+                            m.month === thisMonth && 'b-year__current',
+                            m.month > thisMonth && 'b-year__future',
                           ]
                             .filter(Boolean)
                             .join(' ')}
@@ -149,7 +165,7 @@ export default function YearShow({ year, months, categories }: Props) {
                         Total
                       </th>
                       <th scope="col" className="b-num">
-                        Moy.
+                        <abbr title="Moyenne mensuelle">Moy.</abbr>
                       </th>
                     </tr>
                   </thead>
@@ -172,9 +188,9 @@ export default function YearShow({ year, months, categories }: Props) {
                             return (
                               <td
                                 key={i}
-                                className={`b-num ${over ? 'b-amount--out' : ''}`}
+                                className={`b-num ${over ? 'b-year__over' : ''}`}
                                 style={
-                                  v > 0
+                                  v > 0 && !over
                                     ? {
                                         // Intensité relative au mois le plus élevé de la catégorie
                                         background: `color-mix(in srgb, ${c.color ?? 'var(--muted)'} ${Math.round(8 + (v / max) * 30)}%, transparent)`,
@@ -185,6 +201,12 @@ export default function YearShow({ year, months, categories }: Props) {
                                   over ? `Budget de ${euros(c.monthlyBudget!)} dépassé` : undefined
                                 }
                               >
+                                {over && (
+                                  <>
+                                    <span aria-hidden="true">! </span>
+                                    <span className="sr-only">Budget dépassé : </span>
+                                  </>
+                                )}
                                 {short(v)}
                               </td>
                             )

@@ -12,6 +12,12 @@ const routes = {
     tokens: [[0,"/"]],
     types: placeholder as Registry['home']['types'],
   },
+  'privacy': {
+    methods: ["GET","HEAD"],
+    pattern: '/confidentialite',
+    tokens: [[0,"confidentialite"]],
+    types: placeholder as Registry['privacy']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',

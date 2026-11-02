@@ -3,19 +3,23 @@ import Logo from '~/components/logo'
 import Footer from '~/components/footer'
 import FlashToasts from '~/components/flash_toasts'
 import ThemeToggle from '~/components/theme_toggle'
+import SkipLinks from '~/components/skip_links'
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <>
+      <SkipLinks navigation={false} />
       <div className="auth">
         <div className="auth__form-col">
-          <div className="auth__form-top">
+          <header className="auth__form-top">
             <Logo />
             <span className="auth__toggle-mobile">
               <ThemeToggle />
             </span>
-          </div>
-          <div className="auth__form-wrap">{children}</div>
+          </header>
+          <main id="contenu" tabIndex={-1} className="auth__form-wrap">
+            {children}
+          </main>
           <Footer compact />
         </div>
 

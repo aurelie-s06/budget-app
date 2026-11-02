@@ -2,6 +2,7 @@ import { Head, useForm, router } from '@inertiajs/react'
 import { useState } from 'react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import FieldError, { fieldProps } from '~/components/field_error'
 
 type Category = {
   id: number
@@ -39,6 +40,7 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
       color: c.color ?? '#6b6f76',
       monthlyBudget: c.monthlyBudget?.toString() ?? '',
     })
+    document.getElementById('name')?.focus()
   }
 
   function cancel() {
@@ -54,7 +56,7 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
     <>
       <Head title="Catégories" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
@@ -81,11 +83,15 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
                         </div>
                       </div>
                       <div className="b-actions">
-                        <button className="b-link" onClick={() => edit(c)}>
-                          Modifier
+                        <button type="button" className="b-link" onClick={() => edit(c)}>
+                          Modifier<span className="sr-only"> {c.name}</span>
                         </button>
-                        <button className="b-link b-link--danger" onClick={() => remove(c)}>
-                          Supprimer
+                        <button
+                          type="button"
+                          className="b-link b-link--danger"
+                          onClick={() => remove(c)}
+                        >
+                          Supprimer<span className="sr-only"> {c.name}</span>
                         </button>
                       </div>
                     </li>
@@ -98,18 +104,24 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
               <h2 className="section__title">
                 {editingId ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
               </h2>
+              <p className="field__hint">
+                Les champs marqués d’un astérisque (*) sont obligatoires.
+              </p>
 
               <div className="field">
                 <label className="field__label" htmlFor="name">
-                  Nom
+                  Nom <span className="b-item__meta">(50 caractères max.)</span>
                 </label>
                 <input
                   id="name"
+                  required
+                  maxLength={50}
+                  {...fieldProps('name-error', form.errors.name)}
                   className="field__input"
                   value={form.data.name}
                   onChange={(e) => form.setData('name', e.target.value)}
                 />
-                {form.errors.name && <p className="field__error">{form.errors.name}</p>}
+                <FieldError id="name-error" message={form.errors.name} />
               </div>
 
               <div className="field">
@@ -127,21 +139,19 @@ export default function CategoriesIndex({ categories }: { categories: Category[]
 
               <div className="field">
                 <label className="field__label" htmlFor="budget">
-                  Budget mensuel (€)
+                  Budget mensuel (€) <span className="b-item__meta">(facultatif)</span>
                 </label>
                 <input
                   id="budget"
+                  {...fieldProps('budget-error', form.errors.monthlyBudget)}
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder="Facultatif"
                   className="field__input"
                   value={form.data.monthlyBudget}
                   onChange={(e) => form.setData('monthlyBudget', e.target.value)}
                 />
-                {form.errors.monthlyBudget && (
-                  <p className="field__error">{form.errors.monthlyBudget}</p>
-                )}
+                <FieldError id="budget-error" message={form.errors.monthlyBudget} />
               </div>
 
               <div className="b-row">

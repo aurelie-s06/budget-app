@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import { today } from '~/lib/dates'
+import TransferRoute from '~/components/transfer_route'
+import FieldError, { fieldProps } from '~/components/field_error'
 
 type Type = 'income' | 'expense' | 'transfer'
 type Frequency = 'weekly' | 'monthly' | 'yearly'
@@ -33,10 +36,16 @@ type Props = {
   categories: Option[]
 }
 
+const TRANSFER_SIGN = (
+  <>
+    <span aria-hidden="true">⇄</span>
+    <span className="sr-only">Virement de</span>
+  </>
+)
 const AMOUNT = {
   income: { sign: '+', className: 'b-amount--in' },
   expense: { sign: '−', className: 'b-amount--out' },
-  transfer: { sign: '⇄', className: 'b-amount--move' },
+  transfer: { sign: TRANSFER_SIGN, className: 'b-amount--move' },
 }
 const FREQUENCIES: { value: Frequency; label: string }[] = [
   { value: 'monthly', label: 'Tous les mois' },
@@ -45,7 +54,6 @@ const FREQUENCIES: { value: Frequency; label: string }[] = [
 ]
 
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-const today = () => new Date().toISOString().slice(0, 10)
 const parse = (iso: string) => new Date(`${iso}T00:00`)
 const longDate = (iso: string) =>
   parse(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -137,6 +145,7 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
       toAccountId: r.toAccountId?.toString() ?? '',
       categoryId: r.categoryId?.toString() ?? '',
     })
+    document.getElementById('r-description')?.focus()
   }
 
   function cancel() {
@@ -166,13 +175,13 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
     <>
       <Head title="Opérations récurrentes" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
               <Link href="/transactions" className="b-link b-back">
                 <ArrowLeft size={14} aria-hidden="true" />
-                Opérations
+                Retour aux opérations
               </Link>
               <h1 className="page__title">Opérations récurrentes</h1>
               <p className="page__description">
@@ -199,7 +208,7 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                 ) : (
                   <>
                     <p className="b-summary">
-                      {rules.length} récurrence(s) · environ{' '}
+                      {rules.length} récurrence{rules.length > 1 ? 's' : ''} · environ{' '}
                       <span className={monthly < 0 ? 'b-amount--out' : 'b-amount--in'}>
                         {monthly < 0 ? '−' : '+'} {euros(Math.abs(monthly))}
                       </span>{' '}
@@ -219,9 +228,11 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                             <div className="b-item__title">{r.description}</div>
                             <div className="b-item__meta">
                               {rhythm(r.frequency, r.startDate)} ·{' '}
-                              {r.type === 'transfer'
-                                ? `${r.accountName} → ${r.toAccountName}`
-                                : [r.categoryName, r.accountName].filter(Boolean).join(' · ')}
+                              {r.type === 'transfer' ? (
+                                <TransferRoute from={r.accountName} to={r.toAccountName} />
+                              ) : (
+                                [r.categoryName, r.accountName].filter(Boolean).join(' · ')
+                              )}
                             </div>
                             <div className="b-item__meta">
                               {r.nextDate
@@ -233,11 +244,15 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                             {AMOUNT[r.type].sign} {euros(r.amount)}
                           </span>
                           <div className="b-actions">
-                            <button className="b-link" onClick={() => edit(r)}>
-                              Modifier
+                            <button type="button" className="b-link" onClick={() => edit(r)}>
+                              Modifier<span className="sr-only"> {r.description}</span>
                             </button>
-                            <button className="b-link b-link--danger" onClick={() => remove(r)}>
-                              Supprimer
+                            <button
+                              type="button"
+                              className="b-link b-link--danger"
+                              onClick={() => remove(r)}
+                            >
+                              Supprimer<span className="sr-only"> {r.description}</span>
                             </button>
                           </div>
                         </li>
@@ -251,8 +266,11 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                 <h2 className="section__title">
                   {editing ? 'Modifier la récurrence' : 'Nouvelle récurrence'}
                 </h2>
+                <p className="field__hint">
+                  Les champs marqués d’un astérisque (*) sont obligatoires.
+                </p>
 
-                <div className="b-toggle b-toggle--3">
+                <div className="b-toggle b-toggle--3" role="group" aria-label="Type d’opération">
                   <button
                     type="button"
                     aria-pressed={form.data.type === 'expense'}
@@ -280,18 +298,19 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
 
                 <div className="field">
                   <label className="field__label" htmlFor="r-description">
-                    Description
+                    Description <span className="b-item__meta">(100 caractères max.)</span>
                   </label>
                   <input
                     id="r-description"
+                    required
+                    maxLength={100}
+                    {...fieldProps('r-description-error', form.errors.description)}
                     className="field__input"
                     placeholder={isTransfer ? 'Épargne du mois' : 'Loyer, Netflix, Salaire…'}
                     value={form.data.description}
                     onChange={(e) => form.setData('description', e.target.value)}
                   />
-                  {form.errors.description && (
-                    <p className="field__error">{form.errors.description}</p>
-                  )}
+                  <FieldError id="r-description-error" message={form.errors.description} />
                 </div>
 
                 <div className="field">
@@ -300,6 +319,8 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                   </label>
                   <input
                     id="r-amount"
+                    required
+                    {...fieldProps('r-amount-error', form.errors.amount)}
                     type="number"
                     step="0.01"
                     min="0.01"
@@ -307,7 +328,7 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                     value={form.data.amount}
                     onChange={(e) => form.setData('amount', e.target.value)}
                   />
-                  {form.errors.amount && <p className="field__error">{form.errors.amount}</p>}
+                  <FieldError id="r-amount-error" message={form.errors.amount} />
                 </div>
 
                 <div className="field">
@@ -316,6 +337,7 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                   </label>
                   <select
                     id="r-frequency"
+                    required
                     className="field__input"
                     value={form.data.frequency}
                     onChange={(e) => form.setData('frequency', e.target.value as Frequency)}
@@ -335,6 +357,8 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                     </label>
                     <input
                       id="r-start"
+                      required
+                      {...fieldProps('r-start-error', form.errors.startDate)}
                       type="date"
                       className="field__input"
                       value={form.data.startDate}
@@ -343,10 +367,11 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                   </div>
                   <div className="field">
                     <label className="field__label" htmlFor="r-end">
-                      Jusqu’au
+                      Jusqu’au <span className="b-item__meta">(facultatif)</span>
                     </label>
                     <input
                       id="r-end"
+                      {...fieldProps('r-end-error', form.errors.endDate)}
                       type="date"
                       className="field__input"
                       value={form.data.endDate}
@@ -354,8 +379,8 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                     />
                   </div>
                 </div>
-                {form.errors.startDate && <p className="field__error">{form.errors.startDate}</p>}
-                {form.errors.endDate && <p className="field__error">{form.errors.endDate}</p>}
+                <FieldError id="r-start-error" message={form.errors.startDate} />
+                <FieldError id="r-end-error" message={form.errors.endDate} />
                 <p className="b-form__hint">
                   {editing
                     ? 'Les changements s’appliquent aux prochaines échéances ; les opérations déjà créées ne bougent pas.'
@@ -370,6 +395,7 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                   </label>
                   <select
                     id="r-account"
+                    required
                     className="field__input"
                     value={form.data.accountId}
                     onChange={(e) => chooseAccount(e.target.value)}
@@ -389,6 +415,8 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                     </label>
                     <select
                       id="r-to-account"
+                      required
+                      {...fieldProps('r-to-account-error', form.errors.toAccountId)}
                       className="field__input"
                       value={form.data.toAccountId}
                       onChange={(e) => form.setData('toAccountId', e.target.value)}
@@ -402,14 +430,12 @@ export default function RecurringIndex({ rules, accounts, categories }: Props) {
                           </option>
                         ))}
                     </select>
-                    {form.errors.toAccountId && (
-                      <p className="field__error">{form.errors.toAccountId}</p>
-                    )}
+                    <FieldError id="r-to-account-error" message={form.errors.toAccountId} />
                   </div>
                 ) : (
                   <div className="field">
                     <label className="field__label" htmlFor="r-category">
-                      Catégorie
+                      Catégorie <span className="b-item__meta">(facultatif)</span>
                     </label>
                     <select
                       id="r-category"

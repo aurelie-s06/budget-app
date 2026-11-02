@@ -17,15 +17,17 @@ declare module '@adonisjs/inertia/types' {
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.tsx'))['default']>
     'categories/index': ExtractProps<(typeof import('../../inertia/pages/categories/index.tsx'))['default']>
     'dashboard': ExtractProps<(typeof import('../../inertia/pages/dashboard.tsx'))['default']>
+    'errors/forbidden': ExtractProps<(typeof import('../../inertia/pages/errors/forbidden.tsx'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.tsx'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.tsx'))['default']>
     'home': ExtractProps<(typeof import('../../inertia/pages/home.tsx'))['default']>
+    'imports/index': ExtractProps<(typeof import('../../inertia/pages/imports/index.tsx'))['default']>
+    'legal/privacy': ExtractProps<(typeof import('../../inertia/pages/legal/privacy.tsx'))['default']>
     'months/show': ExtractProps<(typeof import('../../inertia/pages/months/show.tsx'))['default']>
     'recurring/index': ExtractProps<(typeof import('../../inertia/pages/recurring/index.tsx'))['default']>
-    'transactions/index': ExtractProps<(typeof import('../../inertia/pages/transactions/index.tsx'))['default']>
-    'years/show': ExtractProps<(typeof import('../../inertia/pages/years/show.tsx'))['default']>
     'settings/show': ExtractProps<(typeof import('../../inertia/pages/settings/show.tsx'))['default']>
-    'imports/index': ExtractProps<(typeof import('../../inertia/pages/imports/index.tsx'))['default']>
+    'transactions/index': ExtractProps<(typeof import('../../inertia/pages/transactions/index.tsx'))['default']>
     'triage/index': ExtractProps<(typeof import('../../inertia/pages/triage/index.tsx'))['default']>
+    'years/show': ExtractProps<(typeof import('../../inertia/pages/years/show.tsx'))['default']>
   }
 }

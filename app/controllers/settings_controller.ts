@@ -19,10 +19,12 @@ async function checkPassword(user: User, password: string) {
   }
 }
 
-// Valeur CSV : entre guillemets si besoin, guillemets internes doublés
+// Valeur CSV : entre guillemets si besoin, guillemets internes doublés.
+// Une apostrophe neutralise ce qu'Excel exécuterait comme une formule (libellé « =... »)
 function csv(value: string | number | null) {
-  const text = value === null ? '' : String(value)
-  return /[";\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
+  const raw = value === null ? '' : String(value)
+  const text = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw
+  return /[";\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }
 
 const TYPES = { income: 'Revenu', expense: 'Dépense', transfer: 'Virement' }

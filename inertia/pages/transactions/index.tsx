@@ -5,6 +5,7 @@ import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
 import { ArrowDown, ArrowUp, ArrowUpDown, FileUp, Repeat, Tags } from 'lucide-react'
 import TransactionForm, { type EditableTransaction } from '~/components/transaction_form'
+import TransferRoute from '~/components/transfer_route'
 
 type Transaction = EditableTransaction & {
   accountName: string
@@ -39,12 +40,18 @@ type Props = {
 const euros = (n: number) => n.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 // "2026-04" -> "avril 2026"
 const monthLabel = (m: string) =>
-  new Date(`${m}-01`).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+  new Date(`${m}-01T00:00`).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
 // Signe et couleur du montant selon le type d'opération
+const TRANSFER_SIGN = (
+  <>
+    <span aria-hidden="true">⇄</span>
+    <span className="sr-only">Virement de</span>
+  </>
+)
 const AMOUNT = {
   income: { sign: '+', className: 'b-amount--in' },
   expense: { sign: '−', className: 'b-amount--out' },
-  transfer: { sign: '⇄', className: 'b-amount--move' },
+  transfer: { sign: TRANSFER_SIGN, className: 'b-amount--move' },
 }
 const EMPTY_FILTERS: Filters = {
   month: '',
@@ -99,7 +106,7 @@ export default function TransactionsIndex({
       <>
         <Head title="Opérations" />
         <MainNav />
-        <main className="app-main">
+        <main id="contenu" tabIndex={-1} className="app-main">
           <div className="page">
             {header}
             <section className="panel">
@@ -118,15 +125,8 @@ export default function TransactionsIndex({
     )
   }
 
-  // Sur téléphone, le formulaire est sous la liste : on l'amène à l'écran
-  function edit(id: number) {
-    setEditingId(id)
-    requestAnimationFrame(() =>
-      document
-        .querySelector('.b-split > form')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    )
-  }
+  // Le formulaire prend le focus à l'ouverture, ce qui l'amène aussi à l'écran sur téléphone
+  const edit = (id: number) => setEditingId(id)
 
   function remove(t: Transaction) {
     if (confirm(`Supprimer « ${t.description} » ?`)) router.delete(`/transactions/${t.id}`)
@@ -190,7 +190,7 @@ export default function TransactionsIndex({
     <>
       <Head title="Opérations" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           {header}
 
@@ -286,6 +286,8 @@ export default function TransactionsIndex({
                   </label>
                   <input
                     id="f-search"
+                    type="search"
+                    maxLength={100}
                     className="field__input"
                     placeholder="Description ou note…"
                     value={filterValues.search}
@@ -346,8 +348,8 @@ export default function TransactionsIndex({
                 </div>
               </form>
 
-              <p className="b-summary">
-                {transactions.length} opération(s) ·{' '}
+              <p className="b-summary" role="status">
+                {transactions.length} opération{transactions.length > 1 ? 's' : ''} ·{' '}
                 <span className="b-amount--in">+ {euros(totalIncome)}</span> ·{' '}
                 <span className="b-amount--out">− {euros(totalExpense)}</span>
               </p>
@@ -357,9 +359,11 @@ export default function TransactionsIndex({
               ) : (
                 <div className="b-table-wrap">
                   <table className="b-table b-tx">
+                    <caption className="sr-only">Opérations correspondant aux filtres</caption>
                     <thead>
                       <tr>
                         <th
+                          scope="col"
                           aria-sort={
                             sort.startsWith('date')
                               ? sort.endsWith('asc')
@@ -370,8 +374,9 @@ export default function TransactionsIndex({
                         >
                           {sortHeader('date', 'Date')}
                         </th>
-                        <th>Description</th>
+                        <th scope="col">Description</th>
                         <th
+                          scope="col"
                           className="b-num"
                           aria-sort={
                             sort.startsWith('amount')
@@ -383,14 +388,20 @@ export default function TransactionsIndex({
                         >
                           {sortHeader('amount', 'Montant')}
                         </th>
-                        <th />
+                        <th scope="col">
+                          <span className="sr-only">Actions</span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {transactions.map((t) => (
                         <tr key={t.id}>
                           <td className="b-item__meta" style={{ whiteSpace: 'nowrap' }}>
-                            {new Date(t.date).toLocaleDateString('fr-FR')}
+                            {new Date(`${t.date}T00:00`).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
                           </td>
                           <td>
                             <div className="b-item__title">
@@ -399,6 +410,7 @@ export default function TransactionsIndex({
                                 <Repeat
                                   size={12}
                                   className="b-recurring"
+                                  role="img"
                                   aria-label="Opération récurrente"
                                 />
                               )}
@@ -426,9 +438,11 @@ export default function TransactionsIndex({
                                   <span aria-hidden="true">·</span>
                                 </>
                               )}
-                              {t.type === 'transfer'
-                                ? `${t.accountName} → ${t.toAccountName}`
-                                : t.accountName}
+                              {t.type === 'transfer' ? (
+                                <TransferRoute from={t.accountName} to={t.toAccountName} />
+                              ) : (
+                                t.accountName
+                              )}
                             </div>
                           </td>
                           <td className={`b-num b-amount ${AMOUNT[t.type].className}`}>
@@ -436,11 +450,15 @@ export default function TransactionsIndex({
                           </td>
                           <td>
                             <div className="b-actions" style={{ justifyContent: 'flex-end' }}>
-                              <button className="b-link" onClick={() => edit(t.id)}>
-                                Modifier
+                              <button type="button" className="b-link" onClick={() => edit(t.id)}>
+                                Modifier<span className="sr-only"> {t.description}</span>
                               </button>
-                              <button className="b-link b-link--danger" onClick={() => remove(t)}>
-                                Supprimer
+                              <button
+                                type="button"
+                                className="b-link b-link--danger"
+                                onClick={() => remove(t)}
+                              >
+                                Supprimer<span className="sr-only"> {t.description}</span>
                               </button>
                             </div>
                           </td>
@@ -458,6 +476,7 @@ export default function TransactionsIndex({
               accounts={accounts}
               categories={categories}
               className="panel b-form"
+              focusOnMount={editingId !== null}
               onDone={() => setEditingId(null)}
               onCancel={editingId ? () => setEditingId(null) : undefined}
             />

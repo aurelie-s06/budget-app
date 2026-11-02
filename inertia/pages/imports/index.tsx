@@ -1,9 +1,10 @@
 import { Head, router, useForm } from '@inertiajs/react'
 import { Link } from '@adonisjs/inertia/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ChevronDown, CircleAlert, CircleCheck, FileText } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import FieldError, { fieldProps } from '~/components/field_error'
 
 type Line = {
   date: string
@@ -52,21 +53,30 @@ export default function ImportsIndex({ accounts, categories, preview }: Props) {
     <>
       <Head title="Importer un relevé" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
               <Link href="/transactions" className="b-link b-back">
                 <ArrowLeft size={14} aria-hidden="true" />
-                Opérations
+                Retour aux opérations
               </Link>
               <h1 className="page__title">Importer un relevé</h1>
               <p className="page__description">
-                Dépose ton relevé BoursoBank en PDF : les opérations sont lues, nommées et classées.
-                Tu vérifies avant d’enregistrer.
+                Dépose ton relevé BoursoBank en <abbr title="Format de document portable">PDF</abbr>{' '}
+                : les opérations sont lues, nommées et classées. Tu vérifies avant d’enregistrer.
               </p>
             </div>
           </header>
+
+          {accounts.length > 0 && (
+            <ol className="b-steps" aria-label="Étapes de l’import">
+              <li aria-current={preview ? undefined : 'step'}>Étape 1 sur 2 : choisir le relevé</li>
+              <li aria-current={preview ? 'step' : undefined}>
+                Étape 2 sur 2 : vérifier et valider
+              </li>
+            </ol>
+          )}
 
           {accounts.length === 0 ? (
             <section className="panel">
@@ -132,16 +142,18 @@ function UploadStep({ accounts }: { accounts: Props['accounts'] }) {
           {form.data.statement ? 'Clique pour en choisir un autre' : 'ou glisse-le ici'}
         </span>
         <input
+          id="i-statement"
           type="file"
           accept="application/pdf,.pdf"
+          {...fieldProps('i-statement-error', form.errors.statement)}
           onChange={(e) => form.setData('statement', e.target.files?.[0] ?? null)}
         />
       </label>
-      {form.errors.statement && <p className="field__error">{form.errors.statement}</p>}
+      <FieldError id="i-statement-error" message={form.errors.statement} />
 
       <p className="b-form__hint">
-        Relevés de compte BoursoBank. Rien n’est enregistré avant ta confirmation, et les opérations
-        déjà présentes sont repérées.
+        Relevés de compte BoursoBank, au format PDF, 10 Mo maximum. Rien n’est enregistré avant ta
+        confirmation, et les opérations déjà présentes sont repérées.
       </p>
 
       <div className="b-row">
@@ -238,8 +250,17 @@ function PreviewStep({
   const gap =
     after === null || preview.closingBalance === null ? null : after - preview.closingBalance
 
+  // Fermer ou recharger la page perdrait les modifications de l'aperçu
+  useEffect(() => {
+    if (!changed) return
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault()
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [changed])
+
   function submit() {
-    if (!confirm(`Importer ${selected.length} opération(s) dans « ${account?.name} » ?`)) return
+    const count = `${selected.length} opération${selected.length > 1 ? 's' : ''}`
+    if (!confirm(`Importer ${count} dans « ${account?.name} » ?`)) return
     setProcessing(true)
     router.post(
       '/imports',
@@ -322,7 +343,9 @@ function PreviewStep({
               <CircleCheck size={16} aria-hidden="true" />
               {duplicates === lines.length
                 ? 'Toutes ces opérations sont déjà dans l’app.'
-                : `${duplicates} opération(s) déjà dans l’app, décochée(s).`}
+                : duplicates === 1
+                  ? '1 opération déjà dans l’app, décochée.'
+                  : `${duplicates} opérations déjà dans l’app, décochées.`}
             </li>
           )}
           {gap !== null && preview.to && (
@@ -352,7 +375,7 @@ function PreviewStep({
             />
             Tout cocher
           </label>
-          <span className="b-review__tip">Clique sur une opération pour la modifier.</span>
+          <span className="b-review__tip">Choisis une opération pour la modifier.</span>
         </header>
 
         <ul className="b-review__list">
@@ -423,11 +446,12 @@ function PreviewStep({
                     <div className="b-review__fields">
                       <div className="field b-review__wide">
                         <label className="field__label" htmlFor={`e-desc-${i}`}>
-                          Description
+                          Description <span className="b-item__meta">(100 caractères max.)</span>
                         </label>
                         <input
                           id={`e-desc-${i}`}
                           className="field__input"
+                          maxLength={100}
                           value={l.description}
                           autoFocus
                           onChange={(e) => updateSimilar(i, 'description', e.target.value)}
@@ -477,8 +501,10 @@ function PreviewStep({
                         />
                       </div>
                       <div className="field">
-                        <span className="field__label">Type</span>
-                        <div className="b-toggle">
+                        <span id={`e-type-${i}`} className="field__label">
+                          Type
+                        </span>
+                        <div className="b-toggle" role="group" aria-labelledby={`e-type-${i}`}>
                           <button
                             type="button"
                             aria-pressed={l.direction === 'debit'}
@@ -497,25 +523,26 @@ function PreviewStep({
                       </div>
                       <div className="field">
                         <label className="field__label" htmlFor={`e-amount-${i}`}>
-                          Montant (€)
+                          Montant (€) <span className="b-item__meta">(ex. 12,50)</span>
                         </label>
                         <input
                           id={`e-amount-${i}`}
                           className="field__input"
                           inputMode="decimal"
-                          aria-invalid={amount === null ? 'true' : 'false'}
+                          aria-invalid={amount === null ? true : undefined}
                           value={l.amountText}
                           onChange={(e) => update(i, { amountText: e.target.value })}
                         />
                       </div>
                       <div className="field b-review__wide">
                         <label className="field__label" htmlFor={`e-note-${i}`}>
-                          Note
+                          Note{' '}
+                          <span className="b-item__meta">(facultatif, 500 caractères max.)</span>
                         </label>
                         <input
                           id={`e-note-${i}`}
                           className="field__input"
-                          placeholder="Facultatif"
+                          maxLength={500}
                           value={l.noteText}
                           onChange={(e) => update(i, { noteText: e.target.value })}
                         />
@@ -552,7 +579,7 @@ function PreviewStep({
           {edited > 0 && (
             <>
               {' '}
-              · {edited} modifiée(s) ·{' '}
+              · {edited} modifiée{edited > 1 ? 's' : ''} ·{' '}
               <button type="button" className="b-link" onClick={() => setLines(original)}>
                 Tout rétablir
               </button>
@@ -573,7 +600,7 @@ function PreviewStep({
             {processing
               ? 'Import…'
               : invalid > 0
-                ? `${invalid} ligne(s) à corriger`
+                ? `${invalid} ligne${invalid > 1 ? 's' : ''} à corriger`
                 : selected.length === 0
                   ? 'Aucune opération à importer'
                   : `Valider l’import (${selected.length})`}

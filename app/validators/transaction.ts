@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { isoDate } from '#validators/rules'
 
 // Un virement doit arriver sur un autre compte que celui de départ
 export const otherAccount = vine.createRule((value, _, field) => {
@@ -11,7 +12,7 @@ export const transactionValidator = vine.compile(
   vine.object({
     type: vine.enum(['income', 'expense', 'transfer']),
     amount: vine.number().positive(),
-    date: vine.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    date: isoDate(),
     description: vine.string().trim().minLength(1).maxLength(100),
     note: vine.string().trim().maxLength(500).nullable().optional(),
     accountId: vine.number(),
@@ -30,12 +31,9 @@ export const transactionFiltersValidator = vine.compile(
   vine.object({
     month: vine
       .string()
-      .regex(/^\d{4}-\d{2}$/)
+      .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
       .optional(),
-    day: vine
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/)
-      .optional(),
+    day: isoDate().optional(),
     accountId: vine.number().optional(),
     categoryId: vine.number().optional(),
     type: vine.enum(['income', 'expense', 'transfer']).optional(),

@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { DatabaseBackup, Download } from 'lucide-react'
 import Footer from '~/components/footer'
 import MainNav from '~/components/main_nav'
+import FieldError, { fieldProps } from '~/components/field_error'
+import PasswordInput from '~/components/password_input'
 
 type Props = {
   profile: { fullName: string | null; email: string }
@@ -77,7 +79,7 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
     <>
       <Head title="Mon profil" />
       <MainNav />
-      <main className="app-main">
+      <main id="contenu" tabIndex={-1} className="app-main">
         <div className="page">
           <header className="page__header">
             <div>
@@ -91,21 +93,24 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
             <form className="panel" onSubmit={saveProfile}>
               <div className="b-settings__head">
                 <h2 className="section__title">Informations</h2>
+                <p className="section__description">
+                  Les champs marqués d’un astérisque (*) sont obligatoires.
+                </p>
               </div>
               <div className="field">
                 <label className="field__label" htmlFor="s-name">
-                  Nom
+                  Nom <span className="b-item__meta">(facultatif, 100 caractères max.)</span>
                 </label>
                 <input
                   id="s-name"
+                  maxLength={100}
+                  {...fieldProps('s-name-error', profileForm.errors.fullName)}
                   className="field__input"
                   autoComplete="name"
                   value={profileForm.data.fullName}
                   onChange={(e) => profileForm.setData('fullName', e.target.value)}
                 />
-                {profileForm.errors.fullName && (
-                  <p className="field__error">{profileForm.errors.fullName}</p>
-                )}
+                <FieldError id="s-name-error" message={profileForm.errors.fullName} />
               </div>
               <div className="field">
                 <label className="field__label" htmlFor="s-email">
@@ -113,15 +118,15 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
                 </label>
                 <input
                   id="s-email"
+                  required
+                  {...fieldProps('s-email-error', profileForm.errors.email)}
                   type="email"
                   className="field__input"
                   autoComplete="email"
                   value={profileForm.data.email}
                   onChange={(e) => profileForm.setData('email', e.target.value)}
                 />
-                {profileForm.errors.email && (
-                  <p className="field__error">{profileForm.errors.email}</p>
-                )}
+                <FieldError id="s-email-error" message={profileForm.errors.email} />
               </div>
               <div className="b-row">
                 <button
@@ -138,58 +143,53 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
             <form className="panel" onSubmit={savePassword}>
               <div className="b-settings__head">
                 <h2 className="section__title">Mot de passe</h2>
-                <p className="section__description">Entre 8 et 32 caractères.</p>
+                <p className="section__description">
+                  Tous les champs sont obligatoires, et marqués d’un astérisque (*).
+                </p>
               </div>
               <div className="field">
                 <label className="field__label" htmlFor="s-current">
                   Mot de passe actuel
                 </label>
-                <input
+                <PasswordInput
                   id="s-current"
-                  type="password"
-                  className="field__input"
                   autoComplete="current-password"
+                  required
+                  error={passwordForm.errors.currentPassword}
                   value={passwordForm.data.currentPassword}
-                  onChange={(e) => passwordForm.setData('currentPassword', e.target.value)}
+                  onChange={(value) => passwordForm.setData('currentPassword', value)}
                 />
-                {passwordForm.errors.currentPassword && (
-                  <p className="field__error">{passwordForm.errors.currentPassword}</p>
-                )}
               </div>
               <div className="b-row">
                 <div className="field">
                   <label className="field__label" htmlFor="s-password">
                     Nouveau mot de passe
                   </label>
-                  <input
+                  <PasswordInput
                     id="s-password"
-                    type="password"
-                    className="field__input"
                     autoComplete="new-password"
+                    required
+                    showStrength
+                    hint="Entre 8 et 128 caractères."
+                    error={passwordForm.errors.password}
                     value={passwordForm.data.password}
-                    onChange={(e) => passwordForm.setData('password', e.target.value)}
+                    onChange={(value) => passwordForm.setData('password', value)}
                   />
                 </div>
                 <div className="field">
                   <label className="field__label" htmlFor="s-confirmation">
                     Confirmation
                   </label>
-                  <input
+                  <PasswordInput
                     id="s-confirmation"
-                    type="password"
-                    className="field__input"
                     autoComplete="new-password"
+                    required
+                    error={passwordForm.errors.passwordConfirmation}
                     value={passwordForm.data.passwordConfirmation}
-                    onChange={(e) => passwordForm.setData('passwordConfirmation', e.target.value)}
+                    onChange={(value) => passwordForm.setData('passwordConfirmation', value)}
                   />
                 </div>
               </div>
-              {passwordForm.errors.password && (
-                <p className="field__error">{passwordForm.errors.password}</p>
-              )}
-              {passwordForm.errors.passwordConfirmation && (
-                <p className="field__error">{passwordForm.errors.passwordConfirmation}</p>
-              )}
               <div className="b-row">
                 <button
                   type="submit"
@@ -229,7 +229,10 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
                 {/* Lien classique (pas Inertia) : le navigateur télécharge le fichier */}
                 <a href="/settings/export" className="btn btn--secondary" download>
                   <Download size={16} aria-hidden="true" />
-                  Exporter mes opérations (CSV)
+                  <span>
+                    Exporter mes opérations (
+                    <abbr title="Valeurs séparées, à ouvrir dans un tableur">CSV</abbr>)
+                  </span>
                 </a>
               </div>
             </section>
@@ -240,7 +243,7 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
                 <h2 className="section__title">Sauvegardes</h2>
                 <p className="section__description">
                   Une copie complète de l’app est faite chaque jour, et les 15 dernières sont
-                  gardées.
+                  gardées. Ces copies ne sont pas chiffrées.
                 </p>
               </div>
               <dl className="b-counts">
@@ -292,17 +295,14 @@ export default function SettingsShow({ profile, stats, backups }: Props) {
                 <label className="field__label" htmlFor="s-delete">
                   Mot de passe
                 </label>
-                <input
+                <PasswordInput
                   id="s-delete"
-                  type="password"
-                  className="field__input"
                   autoComplete="current-password"
+                  required
+                  error={deleteForm.errors.currentPassword}
                   value={deleteForm.data.currentPassword}
-                  onChange={(e) => deleteForm.setData('currentPassword', e.target.value)}
+                  onChange={(value) => deleteForm.setData('currentPassword', value)}
                 />
-                {deleteForm.errors.currentPassword && (
-                  <p className="field__error">{deleteForm.errors.currentPassword}</p>
-                )}
               </div>
               <div className="b-row">
                 <button
